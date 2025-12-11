@@ -14,6 +14,7 @@ Next.js + Tailwind SEMBLA prototype with Supabase + Replicate hooks for selfie i
 - Typography: Helvetica Now Display / Text, GT America Mono for data
 - Cursor: platinum crosshair → blood red on hover
 - Layout: 12-col rigid grid, heavy negative space, zero rounded corners, type-led screens in the order specified (hero, nav on scroll, Face value, Live Rates, For Models/Clients, Valuation Tool, footer)
+- Model imagery: place roster frames in `public/models/` as `model-a.png` … `model-f.png`; repo ignores these files by default (`.gitkeep` only)
 
 ## Getting started
 1) Install deps

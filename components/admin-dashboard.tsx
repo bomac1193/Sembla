@@ -70,25 +70,25 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="card p-4 lg:p-6 space-y-4">
+    <div className="border border-platinum/30 bg-black/80 p-4 lg:p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-white/60">Live</p>
-          <p className="text-sm text-white/70">
+          <p className="text-xs uppercase tracking-[0.18em] text-platinum/60">Live</p>
+          <p className="text-sm text-platinum/80">
             {data?.uploads ? `${data.uploads.length} records` : "Demo data until Supabase is configured"}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => mutate()}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-2 text-sm text-white/80 hover:border-white/35"
+            className="inline-flex items-center gap-2 border border-platinum/30 px-3 py-2 text-sm text-platinum hover:border-blood hover:text-blood transition-colors"
           >
             <RefreshCcw className="h-4 w-4" />
             Refresh
           </button>
           <button
             onClick={exportCsv}
-            className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-ink hover:bg-accent-deep"
+            className="inline-flex items-center gap-2 bg-blood px-4 py-2 text-sm font-semibold text-platinum hover:opacity-80"
           >
             <Download className="h-4 w-4" />
             Export CSV
@@ -96,9 +96,9 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-white/10">
-        <table className="min-w-full text-sm text-white/80">
-          <thead className="bg-white/5 uppercase tracking-[0.12em] text-xs text-white/60">
+      <div className="overflow-hidden border border-platinum/20">
+        <table className="min-w-full text-sm text-platinum/80">
+          <thead className="bg-black uppercase tracking-[0.12em] text-xs text-platinum/60">
             <tr>
               <th className="px-4 py-3 text-left">Avatar</th>
               <th className="px-4 py-3 text-left">Vibe</th>
@@ -110,10 +110,10 @@ export default function AdminDashboard() {
           </thead>
           <tbody>
             {uploads.map((upload) => (
-              <tr key={upload.id} className="border-t border-white/10">
+              <tr key={upload.id} className="border-t border-platinum/10">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-10 overflow-hidden rounded-lg border border-white/10 bg-white/5">
+                    <div className="h-12 w-10 overflow-hidden border border-platinum/20 bg-black">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={upload.output_url ?? PLACEHOLDER}
@@ -122,26 +122,26 @@ export default function AdminDashboard() {
                       />
                     </div>
                     <div>
-                      <p className="font-semibold">{upload.email || "anon"}</p>
-                      <p className="text-xs text-white/50">{upload.gender}</p>
+                      <p className="font-semibold text-platinum">{upload.email || "anon"}</p>
+                      <p className="text-xs text-platinum/50">{upload.gender}</p>
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-3 text-white/70">
+                <td className="px-4 py-3 text-platinum/70">
                   {upload.vibe}
-                  <span className="block text-xs text-white/50">{upload.skin_tone}</span>
+                  <span className="block text-xs text-platinum/50">{upload.skin_tone}</span>
                 </td>
-                <td className="px-4 py-3 font-mono text-xs">{upload.license_token}</td>
-                <td className="px-4 py-3 text-white/70">{upload.qr_campaign}</td>
-                <td className="px-4 py-3 text-white/70">{upload.consent_name || "N/A"}</td>
-                <td className="px-4 py-3 text-white/60">{formatDate(upload.created_at)}</td>
+                <td className="px-4 py-3 font-mono text-xs text-platinum">{upload.license_token}</td>
+                <td className="px-4 py-3 text-platinum/70">{upload.qr_campaign}</td>
+                <td className="px-4 py-3 text-platinum/70">{upload.consent_name || "N/A"}</td>
+                <td className="px-4 py-3 text-platinum/60">{formatDate(upload.created_at)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {isLoading ? <p className="text-sm text-white/60">Loading live data…</p> : null}
+      {isLoading ? <p className="text-sm text-platinum/60">Loading live data…</p> : null}
     </div>
   );
 }

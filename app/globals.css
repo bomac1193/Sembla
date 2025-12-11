@@ -4,38 +4,48 @@
 
 :root {
   color-scheme: dark;
-  background-color: #0c0c0e;
+  background-color: #000000;
+}
+
+* {
+  border-radius: 0 !important;
 }
 
 body {
   margin: 0;
-  font-family: "Helvetica Neue", "Satoshi", Inter, system-ui, sans-serif;
-  background: radial-gradient(circle at 15% 20%, rgba(90, 182, 255, 0.14), transparent 25%),
-    radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.06), transparent 30%),
-    #0c0c0e;
-  color: #f8f9fb;
+  font-family: "Helvetica Now Display", "Helvetica Now Text", "Helvetica Neue", sans-serif;
+  background: #000000;
+  color: #d8d8d8;
   min-height: 100vh;
+  cursor: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' stroke='%23d8d8d8' stroke-width='2' fill='none' stroke-linecap='square' stroke-linejoin='miter'%3e%3cpath d='M12 1v22M1 12h22'/%3e%3c/svg%3e")
+      12 12,
+    crosshair;
 }
 
-.grid-overlay {
-  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 0);
-  background-size: 32px 32px;
+a,
+button,
+input,
+textarea,
+select,
+[role="button"] {
+  cursor: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' stroke='%239b0000' stroke-width='2' fill='none' stroke-linecap='square' stroke-linejoin='miter'%3e%3cpath d='M12 1v22M1 12h22'/%3e%3c/svg%3e")
+      12 12,
+    crosshair;
 }
 
-.glow {
-  box-shadow: 0 0 48px rgba(90, 182, 255, 0.35);
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter, 8.75rem);
 }
 
-.card {
-  @apply rounded-2xl border border-white/10 bg-chrome/60 backdrop-blur-lg shadow-2xl;
+.no-highlight {
+  user-select: none;
 }
 
-.tag {
-  @apply inline-flex items-center px-3 py-1 text-xs uppercase tracking-[0.12em] rounded-full border border-white/15 bg-white/5;
-}
-
-.glitch {
-  text-shadow:
-    0.04em 0 0.08em rgba(90, 182, 255, 0.75),
-    -0.04em -0.02em 0.08em rgba(255, 255, 255, 0.65);
+.qr-noise {
+  background-image: repeating-linear-gradient(90deg, #d8d8d8, #d8d8d8 1px, transparent 1px, transparent 6px),
+    repeating-linear-gradient(0deg, #d8d8d8, #d8d8d8 1px, transparent 1px, transparent 6px);
+  background-size: 6px 6px;
+  image-rendering: pixelated;
 }

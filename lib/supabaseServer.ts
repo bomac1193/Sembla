@@ -26,7 +26,7 @@ export const uploadToStorage = async (file: File, path: string) => {
 export const insertAvatar = async (payload: AvatarRow) => {
   const client = createServiceClient();
   if (!client) return null;
-  const { data, error } = await client.from("avatars").insert(payload).select().single();
+  const { data, error } = await client.from("avatars").insert(payload as any).select().single();
   if (error) throw error;
   return data;
 };

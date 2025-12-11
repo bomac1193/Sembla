@@ -7,38 +7,39 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Helvetica Neue"', "Satoshi", "Inter", "system-ui", "sans-serif"]
+        display: ['"Helvetica Now Display"', '"Helvetica Now Text"', '"Helvetica Neue"', "sans-serif"],
+        legal: ['"Helvetica Now Text"', '"Helvetica Neue"', "sans-serif"],
+        mono: ['"GT America Mono"', "SFMono-Regular", "Menlo", "monospace"]
       },
       colors: {
-        accent: {
-          DEFAULT: "#5AB6FF",
-          deep: "#0A84FF"
-        },
-        ink: "#0C0C0E",
-        chrome: "#101116",
-        haze: "#C7D2E0"
+        black: "#000000",
+        platinum: "#D8D8D8",
+        blood: "#9B0000",
+        white: "#FFFFFF"
       },
-      backgroundImage: {
-        grid: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0)",
-        noise: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"160\" height=\"160\" viewBox=\"0 0 160 160\"><filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.8\" numOctaves=\"4\" stitchTiles=\"stitch\"/></filter><rect width=\"100%\" height=\"100%\" filter=\"url(%23n)\" opacity=\"0.16\"/></svg>')"
+      spacing: {
+        gutter: "8.75rem", // 140px desktop
+        "gutter-sm": "5rem" // 80px mobile
       },
       keyframes: {
-        glitch: {
-          "0%": { transform: "skew(0deg)" },
-          "20%": { transform: "skew(-2deg)" },
-          "40%": { transform: "skew(2deg)" },
-          "60%": { transform: "skew(-1deg)" },
-          "80%": { transform: "skew(1deg)" },
-          "100%": { transform: "skew(0deg)" }
+        pulseOpacity: {
+          "0%": { opacity: 0.9 },
+          "50%": { opacity: 1.1 },
+          "100%": { opacity: 0.9 }
         },
-        fadeInUp: {
-          "0%": { opacity: 0, transform: "translateY(12px)" },
-          "100%": { opacity: 1, transform: "translateY(0)" }
+        drawLine: {
+          "0%": { width: "0%" },
+          "100%": { width: "100%" }
+        },
+        rain: {
+          "0%": { transform: "translateY(-20%)" },
+          "100%": { transform: "translateY(100%)" }
         }
       },
       animation: {
-        glitch: "glitch 1s ease-in-out infinite alternate",
-        fadeInUp: "fadeInUp 0.6s ease-out forwards"
+        pulseOpacity: "pulseOpacity 4s ease-in-out infinite",
+        drawLine: "drawLine 2s ease forwards",
+        rain: "rain 8s linear infinite"
       }
     }
   },

@@ -1,102 +1,232 @@
-import Link from "next/link";
-import type { ReactNode } from "react";
-import { ArrowRight, Camera, Cpu, Shield, Sparkles } from "lucide-react";
+"use client";
 
-const stats = [
-  { label: "Model-Grade Renders", value: "4K+" },
-  { label: "Consent-Backed", value: "100%" },
-  { label: "Turnaround", value: "<60s" }
+import type React from "react";
+import { useEffect, useMemo, useState } from "react";
+
+const liveRates = [
+  { city: "Paris", time: "17:43", value: "€87,400" },
+  { city: "New York", time: "12:09", value: "€112,200" },
+  { city: "Tokyo", time: "01:12", value: "€68,900" }
 ];
 
+const cardsModels = ["You set the rate", "0 % commission taken ever", "Paid same day in EUR or USDC"];
+
 export default function LandingPage() {
+  const [showNav, setShowNav] = useState(false);
+  const [lineReady, setLineReady] = useState(false);
+  const [valuationState, setValuationState] = useState<"idle" | "scanning" | "ready">("idle");
+
+  useEffect(() => {
+    const onScroll = () => setShowNav(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLineReady(true), 10_000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const valuationValue = useMemo(() => "€________", []);
+
   return (
-    <main className="flex-1">
-      <section className="relative overflow-hidden px-6 py-20 sm:py-28 lg:px-16">
-        <div className="absolute inset-0 bg-noise opacity-30 pointer-events-none" />
-        <div className="relative z-10 max-w-6xl mx-auto grid gap-12 lg:grid-cols-[1.1fr_0.9fr] items-center">
-          <div className="space-y-8">
-            <div className="flex items-center gap-3 text-sm uppercase tracking-[0.28em]">
-              <span className="tag">SEMBLA</span>
-              <span className="tag">Face Value</span>
-            </div>
-            <div className="space-y-6">
-              <p className="text-5xl sm:text-6xl font-semibold leading-[1.05] glitch">
-                Face Value.
-              </p>
-              <p className="text-lg text-white/70 max-w-2xl">
-                Global model AI-gency. Capture a selfie, sign consent, and spin up
-                a licensable, watermark-safe avatar in seconds. Designed for brand
-                scouting, creator collabs, and rapid campaign testing.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/onboarding"
-                className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-ink font-semibold transition hover:-translate-y-0.5 hover:bg-accent-deep"
-              >
-                Enter
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/admin"
-                className="inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-3 text-sm text-white/80 hover:border-white/40"
-              >
-                Admin / Ops
-              </Link>
-            </div>
-            <div className="grid grid-cols-3 gap-4 pt-4">
-              {stats.map((item) => (
-                <div key={item.label} className="card px-4 py-3">
-                  <p className="text-xl font-semibold">{item.value}</p>
-                  <p className="text-xs uppercase tracking-[0.18em] text-white/50">
-                    {item.label}
-                  </p>
-                </div>
-              ))}
-            </div>
+    <main className="bg-black text-platinum">
+      {showNav ? <NavBar /> : null}
+
+      <Hero />
+
+      <section className="min-h-screen flex items-center justify-center border-t border-platinum/10">
+        <div className="text-center">
+          <p className="text-[120px] leading-[0.9] sm:text-[180px] font-black uppercase">Face value.</p>
+          <div className="mt-16 h-[2px] w-full max-w-5xl mx-auto bg-platinum/10" />
+          <div className="mt-16 h-[2px] w-full max-w-5xl mx-auto bg-blood">
+            {lineReady ? <div className="h-[2px] w-full bg-blood animate-drawLine origin-left" /> : null}
           </div>
-          <div className="card relative overflow-hidden border-white/15 bg-gradient-to-br from-white/5 via-chrome/80 to-black/60 p-8">
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-white/5" />
-            <div className="relative flex flex-col gap-6">
-              <p className="uppercase tracking-[0.28em] text-xs text-white/60">Pipeline</p>
-              <div className="space-y-4">
-                <Feature icon={<Camera />} title="Selfie intake">
-                  Live preview, face detection overlay, and consent capture.
-                </Feature>
-                <Feature icon={<Cpu />} title="Model spin-up">
-                  Replicate-powered render jobs with SDXL / StyleGAN presets and QR-tagged runs.
-                </Feature>
-                <Feature icon={<Shield />} title="Governance">
-                  UUID license token, watermark, and Supabase-backed audit trail.
-                </Feature>
-                <Feature icon={<Sparkles />} title="Share">
-                  Export to TikTok/IG, bookable CTA, and Discord alerts for new avatars.
-                </Feature>
+          {lineReady ? (
+            <p className="mt-10 text-[80px] font-black text-blood leading-none">€________</p>
+          ) : null}
+        </div>
+      </section>
+
+      <LiveRates />
+
+      <section className="min-h-screen flex items-center border-t border-platinum/10">
+        <div className="w-full grid-12 px-[5vw]" style={{ "--gutter": "8.75rem" } as any}>
+          <div className="col-span-12 lg:col-span-4 space-y-6">
+            <p className="text-[32px] font-medium uppercase tracking-[0.3em]">For Models</p>
+          </div>
+          <div className="col-span-12 lg:col-span-8 grid grid-cols-1 gap-12">
+            {cardsModels.map((text, idx) => (
+              <div key={text} className="border border-platinum/30 p-8 lg:p-10">
+                <p className="text-[28px] font-medium leading-tight">{text}</p>
+                <p className="mt-6 text-blood text-[36px] font-black animate-pulseOpacity">€________</p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                <p className="text-sm text-white/70">
-                  Scan QR campaigns with <span className="font-semibold">?qr=</span> params
-                  to attribute signups and renders per channel.
-                </p>
-              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="min-h-screen flex items-center justify-center border-t border-platinum/10">
+        <div className="text-center space-y-8 px-[5vw]">
+          <p className="text-[120px] leading-[0.9] font-black uppercase">Book direct. Pay face value. No negotiation.</p>
+        </div>
+      </section>
+
+      <section className="min-h-screen border-t border-platinum/10 flex items-center">
+        <div className="w-full grid-12 px-[5vw]" style={{ "--gutter": "8.75rem" } as any}>
+          <div className="col-span-12 lg:col-span-5 space-y-6">
+            <p className="text-[32px] font-medium uppercase tracking-[0.3em]">Valuation Tool</p>
+            <p className="text-[18px] text-platinum/70 leading-relaxed font-legal">
+              Drop file or activate camera. Three-second scan. We return the live face value and bind it to your wallet.
+            </p>
+          </div>
+          <div className="col-span-12 lg:col-span-7 space-y-6">
+            <DropZone
+              state={valuationState}
+              onStart={() => setValuationState("scanning")}
+              onComplete={() => setTimeout(() => setValuationState("ready"), 3000)}
+            />
+            <div className="border border-platinum/30 p-8 lg:p-10 flex flex-col gap-6">
+              <p className="text-[24px] font-medium uppercase tracking-[0.2em]">Your current face value</p>
+              <p className="text-blood text-[120px] sm:text-[180px] leading-none font-black animate-pulseOpacity">
+                {valuationState === "ready" ? valuationValue : "€________"}
+              </p>
+              <button className="self-start border border-platinum/50 px-6 py-3 text-[16px] uppercase tracking-[0.24em] hover:text-blood hover:border-blood">
+                Claim rate → wallet connect
+              </button>
             </div>
           </div>
         </div>
       </section>
+
+      <Footer />
     </main>
   );
 }
 
-function Feature({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
+function NavBar() {
   return (
-    <div className="flex items-start gap-3">
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10">
-        <span className="text-accent">{icon}</span>
+    <header className="fixed top-0 left-0 right-0 h-20 bg-black/90 border-b border-platinum/20 flex items-center px-[5vw] z-40">
+      <div className="w-full flex items-center justify-between">
+        <span className="text-platinum text-[24px] font-bold tracking-[0.4em] uppercase">SEMBLA</span>
+        <nav className="flex items-center gap-10 text-[16px] uppercase tracking-[0.4em]">
+          {["Models", "Clients", "Rates", "Join"].map((item) => (
+            <span key={item} className="text-platinum hover:text-blood transition-colors">
+              {item}
+            </span>
+          ))}
+        </nav>
       </div>
-      <div>
-        <p className="text-sm font-semibold">{title}</p>
-        <p className="text-sm text-white/60">{children}</p>
+    </header>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden">
+      <div className="px-[5vw] space-y-16">
+        <p className="text-[120px] leading-[1] sm:text-[180px] lg:text-[240px] font-black uppercase">
+          Someone just booked your exact face for{" "}
+          <span className="text-blood animate-pulseOpacity">€________.</span>
+        </p>
+        <p className="text-[48px] sm:text-[60px] font-medium uppercase text-white no-highlight">Find out.</p>
       </div>
+      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-[40%] max-w-[360px] min-w-[180px] aspect-square qr-noise" />
+      <div className="absolute inset-0 pointer-events-none" />
+    </section>
+  );
+}
+
+function LiveRates() {
+  return (
+    <section className="relative min-h-screen border-t border-platinum/10 overflow-hidden">
+      <div className="absolute inset-0 opacity-30">
+        <MatrixRain />
+      </div>
+      <div className="relative z-10 flex items-center justify-center min-h-screen">
+        <div className="grid gap-6 text-[22px] font-mono">
+          {liveRates.map((item) => (
+            <div key={item.city} className="flex items-center gap-6 uppercase tracking-[0.2em]">
+              <span className="w-28 text-platinum">{item.city}</span>
+              <span className="w-20 text-platinum/70">{item.time}</span>
+              <span className="text-platinum">{item.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MatrixRain() {
+  const columns = new Array(12).fill(null);
+  const stream = useMemo(
+    () =>
+      Array.from({ length: 64 })
+        .map((_, i) => `€${(87400 + i * 7).toString().slice(-3).padStart(3, "0")}`)
+        .join(" · "),
+    []
+  );
+  return (
+    <div className="grid grid-cols-6 sm:grid-cols-12 gap-6 h-full px-[5vw]" style={{ "--gutter": "8.75rem" } as any}>
+      {columns.map((_, idx) => (
+        <div key={idx} className="overflow-hidden">
+          <div
+            className="text-platinum/40 font-mono text-[14px] leading-[18px] animate-rain"
+            style={{ animationDelay: `${idx * 0.3}s` }}
+          >
+            {stream}
+          </div>
+        </div>
+      ))}
     </div>
+  );
+}
+
+function DropZone({
+  state,
+  onStart,
+  onComplete
+}: {
+  state: "idle" | "scanning" | "ready";
+  onStart: () => void;
+  onComplete: () => void;
+}) {
+  const handleClick = () => {
+    if (state === "idle") {
+      onStart();
+      onComplete();
+    }
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (state === "idle") {
+      onStart();
+      onComplete();
+    }
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      onDrop={handleDrop}
+      onDragOver={(e) => e.preventDefault()}
+      className="border border-dashed border-platinum/40 p-12 text-center uppercase tracking-[0.2em] text-[16px] hover:border-blood transition-colors"
+    >
+      {state === "idle" && <p>Drop file or activate camera</p>}
+      {state === "scanning" && <p className="text-blood animate-pulseOpacity">Scanning…</p>}
+      {state === "ready" && <p>Scan complete</p>}
+    </div>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="border-t border-platinum/20 bg-black py-10">
+      <p className="text-center text-[14px] text-platinum">
+        © 2026 SEMBLA • Face value. • All rights reserved.
+      </p>
+    </footer>
   );
 }

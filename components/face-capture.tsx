@@ -98,22 +98,24 @@ export default function FaceCapture({ onCapture, onFaceReady }: Props) {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-black/50">
+    <div className="relative overflow-hidden border border-platinum/20 bg-black/70">
       <video ref={videoRef} className="aspect-square w-full object-cover" playsInline muted autoPlay />
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div
-          className={`h-40 w-40 rounded-full border ${faceDetected ? "border-accent shadow-[0_0_40px_rgba(90,182,255,0.4)]" : "border-white/20"}`}
+          className={`h-40 w-40 border ${
+            faceDetected ? "border-blood shadow-[0_0_24px_rgba(155,0,0,0.6)]" : "border-platinum/30"
+          }`}
         />
       </div>
-      <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-black/60 px-3 py-1 text-xs uppercase tracking-[0.18em] text-white/70">
-        {faceDetected ? <CheckCircle2 className="h-4 w-4 text-accent" /> : <Camera className="h-4 w-4" />}
+      <div className="absolute left-3 top-3 flex items-center gap-2 bg-black/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-platinum/80">
+        {faceDetected ? <CheckCircle2 className="h-4 w-4 text-blood" /> : <Camera className="h-4 w-4" />}
         {faceDetected ? "Face locked" : "Align face"}
       </div>
       <div className="absolute bottom-3 right-3">
         <button
           type="button"
           onClick={captureFrame}
-          className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-ink hover:bg-accent-deep"
+          className="inline-flex items-center gap-2 bg-blood px-4 py-2 text-sm font-semibold text-platinum hover:opacity-80"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
           Capture
@@ -124,13 +126,11 @@ export default function FaceCapture({ onCapture, onFaceReady }: Props) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={preview} alt="Captured frame" className="h-full w-full object-cover opacity-80" />
           <div className="absolute bottom-3 left-3 flex items-center gap-2">
-            <span className="rounded-full bg-white/10 px-3 py-1 text-xs uppercase tracking-[0.18em] text-white/70">
-              Captured
-            </span>
+            <span className="bg-black/70 px-3 py-1 text-xs uppercase tracking-[0.18em] text-platinum/80">Captured</span>
             <button
               type="button"
               onClick={() => setPreview(null)}
-              className="rounded-full border border-white/30 px-3 py-1 text-xs text-white hover:border-white/60"
+              className="border border-platinum/40 px-3 py-1 text-xs text-platinum hover:border-blood hover:text-blood"
             >
               Retake
             </button>

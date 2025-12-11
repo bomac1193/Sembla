@@ -3,11 +3,17 @@
 Next.js + Tailwind SEMBLA prototype with Supabase + Replicate hooks for selfie intake, consent logging, AI avatar generation, and admin oversight.
 
 ## Stack
-- Next.js (App Router) + React + Tailwind
+- Next.js 16 (App Router) + React + Tailwind
 - Supabase (Auth/DB/Storage) — avatars table + `faces` storage bucket
 - Replicate API for SDXL/StyleGAN renders
 - Face detection via `@vladmandic/face-api`
 - Discord webhook alert on new avatars
+
+## Brand surface (landing)
+- Palette only: Core Black `#000000`, Surgical Platinum `#D8D8D8`, Deep Blood Red `#9B0000`, Pure White `#FFFFFF` (single-use per page)
+- Typography: Helvetica Now Display / Text, GT America Mono for data
+- Cursor: platinum crosshair → blood red on hover
+- Layout: 12-col rigid grid, heavy negative space, zero rounded corners, type-led screens in the order specified (hero, nav on scroll, Face value, Live Rates, For Models/Clients, Valuation Tool, footer)
 
 ## Getting started
 1) Install deps

@@ -79,12 +79,17 @@ export default function FaceCapture({ onCapture, onFaceReady }: Props) {
   const captureFrame = () => {
     const video = videoRef.current;
     if (!video) return;
+    const vw = video.videoWidth || 720;
+    const vh = video.videoHeight || 720;
+    const side = Math.min(vw, vh);
+    const sx = (vw - side) / 2;
+    const sy = (vh - side) / 2;
     const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth || 720;
-    canvas.height = video.videoHeight || 720;
+    canvas.width = side;
+    canvas.height = side;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(video, sx, sy, side, side, 0, 0, side, side);
     canvas.toBlob(
       (blob) => {
         if (!blob) return;

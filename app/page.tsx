@@ -1,7 +1,8 @@
 "use client";
 
 import type React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const liveRates = [
   { city: "Paris", time: "17:43", value: "€87,400" },
@@ -20,6 +21,9 @@ export default function LandingPage() {
   const [showNav, setShowNav] = useState(false);
   const [lineReady, setLineReady] = useState(false);
   const [valuationState, setValuationState] = useState<"idle" | "scanning" | "ready">("idle");
+  const [valuationError, setValuationError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setShowNav(window.scrollY > 10);
@@ -33,6 +37,38 @@ export default function LandingPage() {
   }, []);
 
   const valuationValue = useMemo(() => "€________", []);
+
+  const handleValuation = async (file: File) => {
+    setValuationState("scanning");
+    setValuationError(null);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append(
+        "options",
+        JSON.stringify({
+          gender: "androgynous",
+          skinTone: "neutral",
+          vibe: "editorial",
+          email: "",
+          consentName: "valuation",
+          consentAgree: true,
+          consentJson: "valuation",
+          qr: "valuation-home"
+        })
+      );
+      const res = await fetch("/api/generate", { method: "POST", body: formData });
+      if (!res.ok) throw new Error("Unable to valuate this file right now.");
+      const payload = await res.json();
+      setValuationState("ready");
+      router.push(
+        `/result?image=${encodeURIComponent(payload.outputUrl)}&license=${payload.licenseToken}&descriptor=${encodeURIComponent(payload.descriptor)}&qr=valuation-home`
+      );
+    } catch (err: any) {
+      setValuationState("idle");
+      setValuationError(err.message || "Valuation failed.");
+    }
+  };
 
   return (
     <main className="bg-black text-platinum">
@@ -105,8 +141,19 @@ export default function LandingPage() {
           <div className="col-span-12 lg:col-span-7 space-y-6">
             <DropZone
               state={valuationState}
-              onStart={() => setValuationState("scanning")}
-              onComplete={() => setTimeout(() => setValuationState("ready"), 3000)}
+              error={valuationError}
+              onSelectClick={() => fileInputRef.current?.click()}
+              onFile={(file) => handleValuation(file)}
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) void handleValuation(file);
+              }}
             />
             <div className="border border-platinum/30 p-8 lg:p-10 flex flex-col gap-6">
               <p className="text-[24px] font-medium uppercase tracking-[0.2em]">Your current face value</p>
@@ -128,8 +175,8 @@ export default function LandingPage() {
 
 function NavBar() {
   const navItems = [
-    { label: "Models", href: "#models" },
-    { label: "Clients", href: "#clients" },
+    { label: "Models", href: "/models" },
+    { label: "Clients", href: "/clients" },
     { label: "Rates", href: "#live-rates" },
     { label: "Join", href: "/onboarding" }
   ];
@@ -213,38 +260,34 @@ function MatrixRain() {
 
 function DropZone({
   state,
-  onStart,
-  onComplete
+  onFile,
+  onSelectClick,
+  error
 }: {
   state: "idle" | "scanning" | "ready";
-  onStart: () => void;
-  onComplete: () => void;
+  onFile: (file: File) => void;
+  onSelectClick: () => void;
+  error: string | null;
 }) {
-  const handleClick = () => {
-    if (state === "idle") {
-      onStart();
-      onComplete();
-    }
-  };
-
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    if (state === "idle") {
-      onStart();
-      onComplete();
+    const file = event.dataTransfer.files?.[0];
+    if (state === "idle" && file) {
+      onFile(file);
     }
   };
 
   return (
     <div
-      onClick={handleClick}
+      onClick={onSelectClick}
       onDrop={handleDrop}
       onDragOver={(e) => e.preventDefault()}
       className="border border-dashed border-platinum/40 p-12 text-center uppercase tracking-[0.2em] text-[16px] hover:border-blood transition-colors"
     >
-      {state === "idle" && <p>Drop file or activate camera</p>}
+      {state === "idle" && <p>Drop file or click to select</p>}
       {state === "scanning" && <p className="text-blood animate-pulseOpacity">Scanning…</p>}
       {state === "ready" && <p>Scan complete</p>}
+      {error ? <p className="mt-2 text-sm text-blood normal-case">{error}</p> : null}
     </div>
   );
 }

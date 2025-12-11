@@ -10,6 +10,11 @@ const liveRates = [
 ];
 
 const cardsModels = ["You set the rate", "0 % commission taken ever", "Paid same day in EUR or USDC"];
+const modelShots = [
+  { src: "/models/model-1.png", label: "You set the rate" },
+  { src: "/models/model-2.png", label: "0 % commission taken ever" },
+  { src: "/models/model-3.png", label: "Paid same day in EUR or USDC" }
+];
 
 export default function LandingPage() {
   const [showNav, setShowNav] = useState(false);
@@ -35,7 +40,7 @@ export default function LandingPage() {
 
       <Hero />
 
-      <section className="min-h-screen flex items-center justify-center border-t border-platinum/10">
+      <section id="face-value" className="min-h-screen flex items-center justify-center border-t border-platinum/10 scroll-mt-24">
         <div className="text-center">
           <p className="text-[120px] leading-[0.9] sm:text-[180px] font-black uppercase">Face value.</p>
           <div className="mt-16 h-[2px] w-full max-w-5xl mx-auto bg-platinum/10" />
@@ -50,29 +55,46 @@ export default function LandingPage() {
 
       <LiveRates />
 
-      <section className="min-h-screen flex items-center border-t border-platinum/10">
+      <section id="models" className="min-h-screen flex items-center border-t border-platinum/10 scroll-mt-24">
         <div className="w-full grid-12 px-[5vw]" style={{ "--gutter": "8.75rem" } as any}>
           <div className="col-span-12 lg:col-span-4 space-y-6">
             <p className="text-[32px] font-medium uppercase tracking-[0.3em]">For Models</p>
           </div>
           <div className="col-span-12 lg:col-span-8 grid grid-cols-1 gap-12">
-            {cardsModels.map((text, idx) => (
-              <div key={text} className="border border-platinum/30 p-8 lg:p-10">
-                <p className="text-[28px] font-medium leading-tight">{text}</p>
-                <p className="mt-6 text-blood text-[36px] font-black animate-pulseOpacity">€________</p>
-              </div>
-            ))}
+            {cardsModels.map((text, idx) => {
+              const shot = modelShots[idx]?.src;
+              return (
+                <div
+                  key={text}
+                  className="border border-platinum/30 bg-black/90 p-8 lg:p-10 relative overflow-hidden"
+                  style={
+                    shot
+                      ? {
+                          backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.8), rgba(0,0,0,0.95)), url(${shot})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center"
+                        }
+                      : undefined
+                  }
+                >
+                  <div className="relative space-y-6">
+                    <p className="text-[28px] font-medium leading-tight">{text}</p>
+                    <p className="text-blood text-[36px] font-black animate-pulseOpacity">€________</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      <section className="min-h-screen flex items-center justify-center border-t border-platinum/10">
+      <section id="clients" className="min-h-screen flex items-center justify-center border-t border-platinum/10 scroll-mt-24">
         <div className="text-center space-y-8 px-[5vw]">
           <p className="text-[120px] leading-[0.9] font-black uppercase">Book direct. Pay face value. No negotiation.</p>
         </div>
       </section>
 
-      <section className="min-h-screen border-t border-platinum/10 flex items-center">
+      <section id="valuation" className="min-h-screen border-t border-platinum/10 flex items-center scroll-mt-24">
         <div className="w-full grid-12 px-[5vw]" style={{ "--gutter": "8.75rem" } as any}>
           <div className="col-span-12 lg:col-span-5 space-y-6">
             <p className="text-[32px] font-medium uppercase tracking-[0.3em]">Valuation Tool</p>
@@ -105,15 +127,21 @@ export default function LandingPage() {
 }
 
 function NavBar() {
+  const navItems = [
+    { label: "Models", href: "#models" },
+    { label: "Clients", href: "#clients" },
+    { label: "Rates", href: "#live-rates" },
+    { label: "Join", href: "/onboarding" }
+  ];
   return (
     <header className="fixed top-0 left-0 right-0 h-20 bg-black/90 border-b border-platinum/20 flex items-center px-[5vw] z-40">
       <div className="w-full flex items-center justify-between">
         <span className="text-platinum text-[24px] font-bold tracking-[0.4em] uppercase">SEMBLA</span>
         <nav className="flex items-center gap-10 text-[16px] uppercase tracking-[0.4em]">
-          {["Models", "Clients", "Rates", "Join"].map((item) => (
-            <span key={item} className="text-platinum hover:text-blood transition-colors">
-              {item}
-            </span>
+          {navItems.map((item) => (
+            <a key={item.label} href={item.href} className="text-platinum hover:text-blood transition-colors">
+              {item.label}
+            </a>
           ))}
         </nav>
       </div>
@@ -123,7 +151,7 @@ function NavBar() {
 
 function Hero() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden">
+    <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden scroll-mt-24">
       <div className="px-[5vw] space-y-16">
         <p className="text-[120px] leading-[1] sm:text-[180px] lg:text-[240px] font-black uppercase">
           Someone just booked your exact face for{" "}
@@ -139,7 +167,7 @@ function Hero() {
 
 function LiveRates() {
   return (
-    <section className="relative min-h-screen border-t border-platinum/10 overflow-hidden">
+    <section id="live-rates" className="relative min-h-screen border-t border-platinum/10 overflow-hidden scroll-mt-24">
       <div className="absolute inset-0 opacity-30">
         <MatrixRain />
       </div>

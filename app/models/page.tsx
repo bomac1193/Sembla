@@ -42,6 +42,14 @@ const roster = [
     token: "FX-62E",
     image: "/models/model-e.png",
     bio: "Structured brows, clean cheeklines, versatile for beauty and avant editorial."
+  },
+  {
+    name: "NANO-06",
+    rate: "€101,300",
+    city: "Milan",
+    token: "FX-75F",
+    image: "/models/model-f.png",
+    bio: "High-contrast silhouette, confident stare, tailored for couture and luxury tech fusions."
   }
 ];
 

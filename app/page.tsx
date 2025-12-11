@@ -12,9 +12,9 @@ const liveRates = [
 
 const cardsModels = ["You set the rate", "0 % commission taken ever", "Paid same day in EUR or USDC"];
 const modelShots = [
-  { src: "/models/model-1.png", label: "You set the rate" },
-  { src: "/models/model-2.png", label: "0 % commission taken ever" },
-  { src: "/models/model-3.png", label: "Paid same day in EUR or USDC" }
+  { src: "/models/model-a.png", label: "You set the rate" },
+  { src: "/models/model-b.png", label: "0 % commission taken ever" },
+  { src: "/models/model-c.png", label: "Paid same day in EUR or USDC" }
 ];
 
 export default function LandingPage() {

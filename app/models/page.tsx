@@ -1,11 +1,48 @@
- "use client";
+"use client";
 
 import { useMemo, useState } from "react";
 
 const roster = [
-  { name: "NANO-01", rate: "€87,400", city: "Paris", token: "FX-91A", image: "/models/model-1.png" },
-  { name: "NANO-02", rate: "€112,200", city: "New York", token: "FX-17C", image: "/models/model-2.png" },
-  { name: "NANO-03", rate: "€68,900", city: "Tokyo", token: "FX-44B", image: "/models/model-3.png" }
+  {
+    name: "NANO-01",
+    rate: "€87,400",
+    city: "Paris",
+    token: "FX-91A",
+    image: "/models/model-a.png",
+    bio: "Chromatic androgyny, angular bone structure, editorial lighting friendly."
+  },
+  {
+    name: "NANO-02",
+    rate: "€112,200",
+    city: "New York",
+    token: "FX-17C",
+    image: "/models/model-b.png",
+    bio: "Steel gaze, sharp jawline, urban luxury tone calibrated for campaign hero frames."
+  },
+  {
+    name: "NANO-03",
+    rate: "€68,900",
+    city: "Tokyo",
+    token: "FX-44B",
+    image: "/models/model-c.png",
+    bio: "Porcelain clarity, balanced symmetry, excels in monochrome high-contrast sets."
+  },
+  {
+    name: "NANO-04",
+    rate: "€94,200",
+    city: "Berlin",
+    token: "FX-28D",
+    image: "/models/model-d.png",
+    bio: "Architectural profile, minimal expression set, engineered for luxe tech crossovers."
+  },
+  {
+    name: "NANO-05",
+    rate: "€73,500",
+    city: "London",
+    token: "FX-62E",
+    image: "/models/model-e.png",
+    bio: "Structured brows, clean cheeklines, versatile for beauty and avant editorial."
+  }
 ];
 
 export default function ModelsPage() {
@@ -48,6 +85,7 @@ export default function ModelsPage() {
             </div>
             <div className="text-blood text-[36px] font-black">{m.rate}</div>
             <div className="font-mono text-sm text-platinum/80">Token: {m.token}</div>
+            <p className="text-sm text-platinum/75 leading-relaxed">{m.bio}</p>
             <button className="self-start border border-platinum/40 px-4 py-2 text-xs uppercase tracking-[0.2em] hover:border-blood hover:text-blood">
               Book
             </button>

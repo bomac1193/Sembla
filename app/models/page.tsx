@@ -36,14 +36,6 @@ const roster = [
     bio: "Architectural profile, minimal expression set, engineered for luxe tech crossovers."
   },
   {
-    name: "NANO-05",
-    rate: "€73,500",
-    city: "London",
-    token: "FX-62E",
-    image: "/models/model-e.png",
-    bio: "Structured brows, clean cheeklines, versatile for beauty and avant editorial."
-  },
-  {
     name: "NANO-06",
     rate: "€101,300",
     city: "Milan",

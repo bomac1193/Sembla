@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  background-color: #0c0c0e;
+}
+
+body {
+  margin: 0;
+  font-family: "Helvetica Neue", "Satoshi", Inter, system-ui, sans-serif;
+  background: radial-gradient(circle at 15% 20%, rgba(90, 182, 255, 0.14), transparent 25%),
+    radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.06), transparent 30%),
+    #0c0c0e;
+  color: #f8f9fb;
+  min-height: 100vh;
+}
+
+.grid-overlay {
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 0);
+  background-size: 32px 32px;
+}
+
+.glow {
+  box-shadow: 0 0 48px rgba(90, 182, 255, 0.35);
+}
+
+.card {
+  @apply rounded-2xl border border-white/10 bg-chrome/60 backdrop-blur-lg shadow-2xl;
+}
+
+.tag {
+  @apply inline-flex items-center px-3 py-1 text-xs uppercase tracking-[0.12em] rounded-full border border-white/15 bg-white/5;
+}
+
+.glitch {
+  text-shadow:
+    0.04em 0 0.08em rgba(90, 182, 255, 0.75),
+    -0.04em -0.02em 0.08em rgba(255, 255, 255, 0.65);
+}

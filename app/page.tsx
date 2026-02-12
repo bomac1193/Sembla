@@ -1,169 +1,167 @@
 "use client";
 
-import type React from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
-const liveRates = [
-  { city: "Paris", time: "17:43", value: "€87,400" },
-  { city: "New York", time: "12:09", value: "€112,200" },
-  { city: "Tokyo", time: "01:12", value: "€68,900" }
-];
-
-const cardsModels = ["You set the rate", "0 % commission taken ever", "Paid same day in EUR or USDC"];
-const modelShots = [
-  { src: "/models/model-a.png", label: "You set the rate" },
-  { src: "/models/model-b.png", label: "0 % commission taken ever" },
-  { src: "/models/model-c.png", label: "Paid same day in EUR or USDC" }
+const roster = [
+  {
+    name: "NANO-01",
+    discipline: "DJ / Visual Artist",
+    city: "Paris",
+    token: "FX-91A",
+    image: "/models/model-a.png",
+    status: "Available"
+  },
+  {
+    name: "NANO-02",
+    discipline: "DJ / Model",
+    city: "New York",
+    token: "FX-17C",
+    image: "/models/model-b.png",
+    status: "Booked"
+  },
+  {
+    name: "NANO-03",
+    discipline: "Producer / Model",
+    city: "Tokyo",
+    token: "FX-44B",
+    image: "/models/model-c.png",
+    status: "Available"
+  },
+  {
+    name: "NANO-04",
+    discipline: "DJ / Creative Director",
+    city: "Berlin",
+    token: "FX-28D",
+    image: "/models/model-d.png",
+    status: "Available"
+  },
+  {
+    name: "NANO-06",
+    discipline: "DJ / Model",
+    city: "Milan",
+    token: "FX-75F",
+    image: "/models/model-f.png",
+    status: "On Hold"
+  }
 ];
 
 export default function LandingPage() {
   const [showNav, setShowNav] = useState(false);
-  const [lineReady, setLineReady] = useState(false);
-  const [valuationState, setValuationState] = useState<"idle" | "scanning" | "ready">("idle");
-  const [valuationError, setValuationError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
-    const onScroll = () => setShowNav(window.scrollY > 10);
+    const onScroll = () => setShowNav(window.scrollY > 80);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLineReady(true), 10_000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const valuationValue = useMemo(() => "€________", []);
-
-  const handleValuation = async (file: File) => {
-    setValuationState("scanning");
-    setValuationError(null);
-    try {
-      const formData = new FormData();
-      formData.append("image", file);
-      formData.append(
-        "options",
-        JSON.stringify({
-          gender: "androgynous",
-          skinTone: "neutral",
-          vibe: "editorial",
-          email: "",
-          consentName: "valuation",
-          consentAgree: true,
-          consentJson: "valuation",
-          qr: "valuation-home"
-        })
-      );
-      const res = await fetch("/api/generate", { method: "POST", body: formData });
-      if (!res.ok) throw new Error("Unable to valuate this file right now.");
-      const payload = await res.json();
-      setValuationState("ready");
-      router.push(
-        `/result?image=${encodeURIComponent(payload.outputUrl)}&license=${payload.licenseToken}&descriptor=${encodeURIComponent(payload.descriptor)}&qr=valuation-home`
-      );
-    } catch (err: any) {
-      setValuationState("idle");
-      setValuationError(err.message || "Valuation failed.");
-    }
-  };
-
   return (
-    <main className="bg-black text-platinum">
-      {showNav ? <NavBar /> : null}
+    <main className="bg-black text-platinum editorial-scroll">
+      {showNav && <NavBar />}
 
-      <Hero />
-
-      <section id="face-value" className="min-h-screen flex items-center justify-center border-t border-platinum/10 scroll-mt-24">
-        <div className="text-center">
-          <p className="text-[120px] leading-[0.9] sm:text-[180px] font-black uppercase">Face value.</p>
-          <div className="mt-16 h-[2px] w-full max-w-5xl mx-auto bg-platinum/10" />
-          <div className="mt-16 h-[2px] w-full max-w-5xl mx-auto bg-blood">
-            {lineReady ? <div className="h-[2px] w-full bg-blood animate-drawLine origin-left" /> : null}
-          </div>
-          {lineReady ? (
-            <p className="mt-10 text-[80px] font-black text-blood leading-none">€________</p>
-          ) : null}
+      {/* ── HERO ── */}
+      <section className="relative h-screen flex flex-col justify-end pb-16 px-6 sm:px-12 editorial-section overflow-hidden">
+        {/* Scan line effect */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="scan-line w-full" />
         </div>
-      </section>
 
-      <LiveRates />
-
-      <section id="models" className="min-h-screen flex items-center border-t border-platinum/10 scroll-mt-24">
-        <div className="w-full grid-12 px-[5vw]" style={{ "--gutter": "8.75rem" } as any}>
-          <div className="col-span-12 lg:col-span-4 space-y-6">
-            <p className="text-[32px] font-medium uppercase tracking-[0.3em]">For Models</p>
+        <div className="relative z-10 max-w-[1400px]">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-2 h-2 bg-blood badge-glow" />
+            <span className="text-[11px] uppercase tracking-[0.5em] text-platinum/50 font-mono">
+              Exclusive Digital Agency
+            </span>
           </div>
-          <div className="col-span-12 lg:col-span-8 grid grid-cols-1 gap-12">
-            {cardsModels.map((text, idx) => {
-              const shot = modelShots[idx]?.src;
-              return (
-                <div
-                  key={text}
-                  className="border border-platinum/30 bg-black/90 p-8 lg:p-10 relative overflow-hidden"
-                  style={
-                    shot
-                      ? {
-                          backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.8), rgba(0,0,0,0.95)), url(${shot})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center"
-                        }
-                      : undefined
-                  }
-                >
-                  <div className="relative space-y-6">
-                    <p className="text-[28px] font-medium leading-tight">{text}</p>
-                    <p className="text-blood text-[36px] font-black animate-pulseOpacity">€________</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
-      <section id="clients" className="min-h-screen flex items-center justify-center border-t border-platinum/10 scroll-mt-24">
-        <div className="text-center space-y-8 px-[5vw]">
-          <p className="text-[120px] leading-[0.9] font-black uppercase">Book direct. Pay face value. No negotiation.</p>
-        </div>
-      </section>
+          <h1 className="text-[clamp(60px,12vw,200px)] font-black uppercase leading-[0.85] tracking-tight">
+            SEMBLA
+          </h1>
 
-      <section id="valuation" className="min-h-screen border-t border-platinum/10 flex items-center scroll-mt-24">
-        <div className="w-full grid-12 px-[5vw]" style={{ "--gutter": "8.75rem" } as any}>
-          <div className="col-span-12 lg:col-span-5 space-y-6">
-            <p className="text-[32px] font-medium uppercase tracking-[0.3em]">Valuation Tool</p>
-            <p className="text-[18px] text-platinum/70 leading-relaxed font-legal">
-              Drop file or activate camera. Three-second scan. We return the live face value and bind it to your wallet.
+          <div className="mt-8 flex items-center gap-8">
+            <div className="rule flex-1 max-w-[200px]" />
+            <p className="text-[14px] sm:text-[16px] uppercase tracking-[0.4em] text-platinum/60">
+              Supermodel DJs &middot; AI Likeness &middot; Consent-as-Code
             </p>
           </div>
-          <div className="col-span-12 lg:col-span-7 space-y-6">
-            <DropZone
-              state={valuationState}
-              error={valuationError}
-              onSelectClick={() => fileInputRef.current?.click()}
-              onFile={(file) => handleValuation(file)}
-            />
-            <input
-              ref={fileInputRef}
-              type="file"
-              className="hidden"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) void handleValuation(file);
-              }}
-            />
-            <div className="border border-platinum/30 p-8 lg:p-10 flex flex-col gap-6">
-              <p className="text-[24px] font-medium uppercase tracking-[0.2em]">Your current face value</p>
-              <p className="text-blood text-[120px] sm:text-[180px] leading-none font-black animate-pulseOpacity">
-                {valuationState === "ready" ? valuationValue : "€________"}
-              </p>
-              <button className="self-start border border-platinum/50 px-6 py-3 text-[16px] uppercase tracking-[0.24em] hover:text-blood hover:border-blood">
-                Claim rate → wallet connect
-              </button>
-            </div>
+
+          <p className="mt-12 text-[18px] sm:text-[22px] leading-relaxed text-platinum/50 max-w-2xl font-legal">
+            We represent a curated roster of supermodel DJs whose digital likeness
+            is licensed exclusively through auditable consent chains. Not an open
+            marketplace. An agency.
+          </p>
+
+          <div className="mt-12 flex items-center gap-6">
+            <Link
+              href="/models"
+              className="border border-platinum/40 px-8 py-4 text-[13px] uppercase tracking-[0.4em] hover:border-blood hover:text-blood transition-colors"
+            >
+              View Roster
+            </Link>
+            <Link
+              href="#inquiry"
+              className="text-[13px] uppercase tracking-[0.4em] text-platinum/40 hover:text-platinum transition-colors"
+            >
+              Brand Inquiry &rarr;
+            </Link>
+          </div>
+        </div>
+
+        {/* Bottom index */}
+        <div className="absolute bottom-6 right-6 sm:right-12 text-[11px] font-mono text-platinum/20 uppercase tracking-[0.3em]">
+          {roster.length} on roster
+        </div>
+      </section>
+
+      {/* ── ROSTER PREVIEW ── */}
+      {roster.map((model, idx) => (
+        <ModelSection key={model.token} model={model} index={idx + 1} />
+      ))}
+
+      {/* ── FOR BRANDS ── */}
+      <section id="inquiry" className="min-h-screen flex items-center editorial-section border-t border-platinum/5">
+        <div className="w-full px-6 sm:px-12 py-24 max-w-[1400px]">
+          <div className="flex items-center gap-4 mb-12">
+            <div className="w-2 h-2 bg-platinum/30" />
+            <span className="text-[11px] uppercase tracking-[0.5em] text-platinum/40 font-mono">
+              For Brands &amp; Agencies
+            </span>
+          </div>
+
+          <h2 className="text-[clamp(36px,6vw,80px)] font-black uppercase leading-[0.9]">
+            License a face.<br />
+            <span className="text-platinum/30">Not a stock photo.</span>
+          </h2>
+
+          <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-px bg-platinum/10">
+            {[
+              {
+                title: "Auditable Consent",
+                desc: "Every avatar carries a signed consent JSON — signer, timestamp, rights granted, campaign attribution. Immutable."
+              },
+              {
+                title: "Provenance Chain",
+                desc: "From selfie to generated asset: full chain-of-custody. License token, watermark, revocation capability."
+              },
+              {
+                title: "Direct Economics",
+                desc: "Zero commission. Models set rates. Same-day settlement in EUR or USDC. No intermediary markup."
+              }
+            ].map((item) => (
+              <div key={item.title} className="bg-black p-8 lg:p-12">
+                <p className="text-[13px] uppercase tracking-[0.4em] text-blood mb-4">{item.title}</p>
+                <p className="text-[15px] text-platinum/60 leading-relaxed font-legal">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-16">
+            <a
+              href="mailto:hello@sembla.agency"
+              className="inline-block border border-blood/50 px-10 py-5 text-[13px] uppercase tracking-[0.4em] text-blood hover:bg-blood hover:text-black transition-all"
+            >
+              Request Access
+            </a>
           </div>
         </div>
       </section>
@@ -173,131 +171,127 @@ export default function LandingPage() {
   );
 }
 
-function NavBar() {
-  const navItems = [
-    { label: "Models", href: "/models" },
-    { label: "Clients", href: "/clients" },
-    { label: "Rates", href: "#live-rates" },
-    { label: "Join", href: "/onboarding" }
-  ];
+function ModelSection({ model, index }: { model: typeof roster[0]; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <header className="fixed top-0 left-0 right-0 h-20 bg-black/90 border-b border-platinum/20 flex items-center px-[5vw] z-40">
-      <div className="w-full flex items-center justify-between">
-        <span className="text-platinum text-[24px] font-bold tracking-[0.4em] uppercase">SEMBLA</span>
-        <nav className="flex items-center gap-10 text-[16px] uppercase tracking-[0.4em]">
-          {navItems.map((item) => (
-            <a key={item.label} href={item.href} className="text-platinum hover:text-blood transition-colors">
-              {item.label}
-            </a>
-          ))}
+    <section
+      ref={ref}
+      className="editorial-section border-t border-platinum/5 relative"
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-12 min-h-screen">
+        {/* Image — takes full height on mobile, 8 cols on desktop */}
+        <div className="lg:col-span-7 relative h-[70vh] lg:h-auto overflow-hidden bg-smoke">
+          <img
+            src={model.image}
+            alt={model.name}
+            className={`model-portrait w-full h-full transition-all duration-1000 ${
+              visible ? "opacity-100 scale-100" : "opacity-0 scale-105"
+            }`}
+          />
+          {/* Gradient overlay bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-black" />
+
+          {/* Index number overlay */}
+          <div className="absolute top-6 left-6 sm:top-8 sm:left-8">
+            <span className="index-num text-[11px] font-mono text-platinum/30 uppercase tracking-[0.3em]">
+              {String(index).padStart(2, "0")} / {String(roster.length).padStart(2, "0")}
+            </span>
+          </div>
+        </div>
+
+        {/* Details — vertical centered on right */}
+        <div className="lg:col-span-5 flex flex-col justify-center px-6 sm:px-12 lg:px-16 py-12 lg:py-24">
+          <div className={`space-y-8 transition-all duration-1000 delay-300 ${
+            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}>
+            {/* Status badge */}
+            <div className="flex items-center gap-3">
+              <div className={`w-1.5 h-1.5 ${
+                model.status === "Available" ? "bg-green-500" :
+                model.status === "Booked" ? "bg-blood" : "bg-yellow-500"
+              }`} />
+              <span className="text-[11px] uppercase tracking-[0.5em] text-platinum/40 font-mono">
+                {model.status}
+              </span>
+            </div>
+
+            {/* Name */}
+            <h2 className="text-[clamp(36px,5vw,72px)] font-black uppercase leading-[0.9] tracking-tight">
+              {model.name}
+            </h2>
+
+            {/* Discipline */}
+            <p className="text-[16px] sm:text-[18px] uppercase tracking-[0.3em] text-platinum/50">
+              {model.discipline}
+            </p>
+
+            {/* Metadata */}
+            <div className="space-y-3 pt-4 border-t border-platinum/10">
+              <div className="flex justify-between text-[12px] uppercase tracking-[0.3em]">
+                <span className="text-platinum/40">City</span>
+                <span className="text-platinum/70">{model.city}</span>
+              </div>
+              <div className="flex justify-between text-[12px] uppercase tracking-[0.3em]">
+                <span className="text-platinum/40">License</span>
+                <span className="font-mono text-platinum/70">{model.token}</span>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="pt-4">
+              <Link
+                href={`/models#${model.token}`}
+                className="border border-platinum/30 px-6 py-3 text-[12px] uppercase tracking-[0.4em] hover:border-blood hover:text-blood transition-colors inline-block"
+              >
+                View Profile
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function NavBar() {
+  return (
+    <header className="fixed top-0 left-0 right-0 h-16 bg-black/95 backdrop-blur-sm border-b border-platinum/10 flex items-center px-6 sm:px-12 z-50">
+      <div className="w-full flex items-center justify-between max-w-[1400px] mx-auto">
+        <Link href="/" className="text-platinum text-[18px] font-bold tracking-[0.5em] uppercase">
+          SEMBLA
+        </Link>
+        <nav className="flex items-center gap-8 text-[11px] uppercase tracking-[0.4em]">
+          <Link href="/models" className="text-platinum/50 hover:text-platinum transition-colors">Roster</Link>
+          <Link href="#inquiry" className="text-platinum/50 hover:text-platinum transition-colors">Brands</Link>
+          <Link href="/roster/upload" className="text-blood/70 hover:text-blood transition-colors">Admin</Link>
         </nav>
       </div>
     </header>
   );
 }
 
-function Hero() {
-  return (
-    <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden scroll-mt-24">
-      <div className="px-[5vw] space-y-16">
-        <p className="text-[120px] leading-[1] sm:text-[180px] lg:text-[240px] font-black uppercase">
-          Someone just booked your exact face for{" "}
-          <span className="text-blood animate-pulseOpacity">€________.</span>
-        </p>
-        <p className="text-[48px] sm:text-[60px] font-medium uppercase text-white no-highlight">Find out.</p>
-      </div>
-      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-[40%] max-w-[360px] min-w-[180px] aspect-square qr-noise" />
-      <div className="absolute inset-0 pointer-events-none" />
-    </section>
-  );
-}
-
-function LiveRates() {
-  return (
-    <section id="live-rates" className="relative min-h-screen border-t border-platinum/10 overflow-hidden scroll-mt-24">
-      <div className="absolute inset-0 opacity-30">
-        <MatrixRain />
-      </div>
-      <div className="relative z-10 flex items-center justify-center min-h-screen">
-        <div className="grid gap-6 text-[22px] font-mono">
-          {liveRates.map((item) => (
-            <div key={item.city} className="flex items-center gap-6 uppercase tracking-[0.2em]">
-              <span className="w-28 text-platinum">{item.city}</span>
-              <span className="w-20 text-platinum/70">{item.time}</span>
-              <span className="text-platinum">{item.value}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function MatrixRain() {
-  const columns = new Array(12).fill(null);
-  const stream = useMemo(
-    () =>
-      Array.from({ length: 64 })
-        .map((_, i) => `€${(87400 + i * 7).toString().slice(-3).padStart(3, "0")}`)
-        .join(" · "),
-    []
-  );
-  return (
-    <div className="grid grid-cols-6 sm:grid-cols-12 gap-6 h-full px-[5vw]" style={{ "--gutter": "8.75rem" } as any}>
-      {columns.map((_, idx) => (
-        <div key={idx} className="overflow-hidden">
-          <div
-            className="text-platinum/40 font-mono text-[14px] leading-[18px] animate-rain"
-            style={{ animationDelay: `${idx * 0.3}s` }}
-          >
-            {stream}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function DropZone({
-  state,
-  onFile,
-  onSelectClick,
-  error
-}: {
-  state: "idle" | "scanning" | "ready";
-  onFile: (file: File) => void;
-  onSelectClick: () => void;
-  error: string | null;
-}) {
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const file = event.dataTransfer.files?.[0];
-    if (state === "idle" && file) {
-      onFile(file);
-    }
-  };
-
-  return (
-    <div
-      onClick={onSelectClick}
-      onDrop={handleDrop}
-      onDragOver={(e) => e.preventDefault()}
-      className="border border-dashed border-platinum/40 p-12 text-center uppercase tracking-[0.2em] text-[16px] hover:border-blood transition-colors"
-    >
-      {state === "idle" && <p>Drop file or click to select</p>}
-      {state === "scanning" && <p className="text-blood animate-pulseOpacity">Scanning…</p>}
-      {state === "ready" && <p>Scan complete</p>}
-      {error ? <p className="mt-2 text-sm text-blood normal-case">{error}</p> : null}
-    </div>
-  );
-}
-
 function Footer() {
   return (
-    <footer className="border-t border-platinum/20 bg-black py-10">
-      <p className="text-center text-[14px] text-platinum">
-        © 2026 SEMBLA • Face value. • All rights reserved.
-      </p>
+    <footer className="border-t border-platinum/10 bg-black py-12 px-6 sm:px-12">
+      <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <span className="text-[18px] font-bold tracking-[0.5em] uppercase text-platinum/30">SEMBLA</span>
+        <p className="text-[11px] text-platinum/30 uppercase tracking-[0.3em] font-mono">
+          &copy; 2026 &middot; Exclusive Digital Agency &middot; Consent-as-Code
+        </p>
+      </div>
     </footer>
   );
 }

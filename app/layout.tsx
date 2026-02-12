@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SEMBLA — Face Value",
-  description: "AI-native model agency MVP for rapid avatar generation and licensing."
+  title: "SEMBLA — Exclusive Digital Agency",
+  description: "Curated roster of supermodel DJs. AI likeness licensing with auditable consent chains. Not a marketplace. An agency."
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

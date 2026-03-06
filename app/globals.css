@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Sohne Font Family ── */
+@font-face { font-family: "Sohne"; src: url("/fonts/sohne-extralight.otf") format("opentype"); font-weight: 200; font-style: normal; font-display: swap; }
+@font-face { font-family: "Sohne"; src: url("/fonts/sohne-light.otf") format("opentype"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Sohne"; src: url("/fonts/sohne-book.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Sohne"; src: url("/fonts/sohne-medium.otf") format("opentype"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Sohne"; src: url("/fonts/sohne-semibold.otf") format("opentype"); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: "Sohne"; src: url("/fonts/sohne-bold.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Sohne"; src: url("/fonts/sohne-extrabold.otf") format("opentype"); font-weight: 800; font-style: normal; font-display: swap; }
+@font-face { font-family: "Sohne"; src: url("/fonts/sohne-black.otf") format("opentype"); font-weight: 900; font-style: normal; font-display: swap; }
+
+/* ── Sohne Mono ── */
+@font-face { font-family: "Sohne Mono"; src: url("/fonts/sohne-mono-book.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Sohne Mono"; src: url("/fonts/sohne-mono-semibold.otf") format("opentype"); font-weight: 600; font-style: normal; font-display: swap; }
+
 :root {
   color-scheme: dark;
   background-color: #000000;
@@ -13,7 +27,7 @@
 
 body {
   margin: 0;
-  font-family: "Helvetica Now Display", "Helvetica Now Text", "Helvetica Neue", sans-serif;
+  font-family: "Sohne", "Helvetica Neue", sans-serif;
   background: #000000;
   color: #d8d8d8;
   min-height: 100vh;
@@ -102,4 +116,61 @@ select,
 @keyframes badgePulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(155, 0, 0, 0.4); }
   50% { box-shadow: 0 0 20px 4px rgba(155, 0, 0, 0.15); }
+}
+
+/* Custom range slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  width: 100%;
+  height: 24px;
+}
+
+input[type="range"]::-webkit-slider-track {
+  height: 1px;
+  background: rgba(216, 216, 216, 0.15);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 1px;
+  background: rgba(216, 216, 216, 0.15);
+  border: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: #9b0000;
+  margin-top: -5px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: #9b0000;
+  border: none;
+}
+
+/* Editable field hover indicator */
+.editable-hover {
+  transition: border-color 0.15s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.editable-hover:hover {
+  border-bottom-color: rgba(155, 0, 0, 0.4);
+}
+
+/* Saved flash */
+@keyframes savedFlash {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.saved-flash {
+  animation: savedFlash 1.5s ease forwards;
 }

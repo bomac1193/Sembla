@@ -1,52 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-
-const roster = [
-  {
-    name: "NANO-01",
-    discipline: "DJ / Visual Artist",
-    city: "Paris",
-    token: "FX-91A",
-    image: "/models/model-a.png",
-    status: "Available"
-  },
-  {
-    name: "NANO-02",
-    discipline: "DJ / Model",
-    city: "New York",
-    token: "FX-17C",
-    image: "/models/model-b.png",
-    status: "Booked"
-  },
-  {
-    name: "NANO-03",
-    discipline: "Producer / Model",
-    city: "Tokyo",
-    token: "FX-44B",
-    image: "/models/model-c.png",
-    status: "Available"
-  },
-  {
-    name: "NANO-04",
-    discipline: "DJ / Creative Director",
-    city: "Berlin",
-    token: "FX-28D",
-    image: "/models/model-d.png",
-    status: "Available"
-  },
-  {
-    name: "NANO-06",
-    discipline: "DJ / Model",
-    city: "Milan",
-    token: "FX-75F",
-    image: "/models/model-f.png",
-    status: "On Hold"
-  }
-];
+import { useRoster } from "@/lib/RosterContext";
+import type { RosterModel } from "@/lib/roster";
 
 export default function LandingPage() {
+  const { roster, isLoaded } = useRoster();
   const [showNav, setShowNav] = useState(false);
 
   useEffect(() => {
@@ -54,6 +15,8 @@ export default function LandingPage() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  if (!isLoaded) return null;
 
   return (
     <main className="bg-black text-platinum editorial-scroll">
@@ -115,7 +78,7 @@ export default function LandingPage() {
 
       {/* ── ROSTER PREVIEW ── */}
       {roster.map((model, idx) => (
-        <ModelSection key={model.token} model={model} index={idx + 1} />
+        <ModelSection key={model.id} model={model} index={idx + 1} total={roster.length} />
       ))}
 
       {/* ── FOR BRANDS ── */}
@@ -171,7 +134,7 @@ export default function LandingPage() {
   );
 }
 
-function ModelSection({ model, index }: { model: typeof roster[0]; index: number }) {
+function ModelSection({ model, index, total }: { model: RosterModel; index: number; total: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -192,11 +155,14 @@ function ModelSection({ model, index }: { model: typeof roster[0]; index: number
       className="editorial-section border-t border-platinum/5 relative"
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 min-h-screen">
-        {/* Image — takes full height on mobile, 8 cols on desktop */}
+        {/* Image — takes full height on mobile, 7 cols on desktop */}
         <div className="lg:col-span-7 relative h-[70vh] lg:h-auto overflow-hidden bg-smoke">
-          <img
+          <Image
             src={model.image}
             alt={model.name}
+            fill
+            unoptimized
+            sizes="(min-width: 1024px) 58vw, 100vw"
             className={`model-portrait w-full h-full transition-all duration-1000 ${
               visible ? "opacity-100 scale-100" : "opacity-0 scale-105"
             }`}
@@ -207,7 +173,7 @@ function ModelSection({ model, index }: { model: typeof roster[0]; index: number
           {/* Index number overlay */}
           <div className="absolute top-6 left-6 sm:top-8 sm:left-8">
             <span className="index-num text-[11px] font-mono text-platinum/30 uppercase tracking-[0.3em]">
-              {String(index).padStart(2, "0")} / {String(roster.length).padStart(2, "0")}
+              {String(index).padStart(2, "0")} / {String(total).padStart(2, "0")}
             </span>
           </div>
         </div>

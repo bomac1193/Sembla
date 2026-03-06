@@ -1,57 +1,61 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { useRoster } from "@/lib/RosterContext";
+import { compressImage, generateToken, generateId } from "@/lib/roster";
+import type { RosterModel } from "@/lib/roster";
 
-const roster = [
-  {
-    name: "NANO-01",
-    discipline: "DJ / Visual Artist",
-    city: "Paris",
-    token: "FX-91A",
-    image: "/models/model-a.png",
-    status: "Available",
-    bio: "Chromatic androgyny, angular bone structure. Splits time between editorial campaigns and underground DJ sets across Paris and Berlin. Known for cross-modal work bridging sonic and visual identity."
-  },
-  {
-    name: "NANO-02",
-    discipline: "DJ / Model",
-    city: "New York",
-    token: "FX-17C",
-    image: "/models/model-b.png",
-    status: "Booked",
-    bio: "Steel gaze, sharp jawline, urban luxury tone. Campaign hero frames for luxury fashion meets nightlife. Resident at three NYC venues, editorial face for two global campaigns."
-  },
-  {
-    name: "NANO-03",
-    discipline: "Producer / Model",
-    city: "Tokyo",
-    token: "FX-44B",
-    image: "/models/model-c.png",
-    status: "Available",
-    bio: "Porcelain clarity, balanced symmetry. Excels in monochrome high-contrast sets. Produces ambient-electronic under a separate alias. Cross-modal coherence score: 94."
-  },
-  {
-    name: "NANO-04",
-    discipline: "DJ / Creative Director",
-    city: "Berlin",
-    token: "FX-28D",
-    image: "/models/model-d.png",
-    status: "Available",
-    bio: "Architectural profile, minimal expression set. Creative directs for luxe tech crossovers. Known for brutalist visual language and deep techno sets."
-  },
-  {
-    name: "NANO-06",
-    discipline: "DJ / Model",
-    city: "Milan",
-    token: "FX-75F",
-    image: "/models/model-f.png",
-    status: "On Hold",
-    bio: "High-contrast silhouette, confident stare. Tailored for couture and luxury tech fusions. Milan fashion week regular, Ibiza residency holder."
-  }
-];
+type ViewMode = "editorial" | "grid";
+
+async function uploadImage(file: File): Promise<string> {
+  try {
+    const formData = new FormData();
+    formData.append("image", file);
+    const res = await fetch("/api/roster/upload", { method: "POST", body: formData });
+    if (res.ok) {
+      const data = await res.json();
+      return data.path;
+    }
+  } catch { /* fall through */ }
+  return compressImage(file, 800, 0.7);
+}
 
 export default function ModelsPage() {
+  const { roster, isLoaded, updateModel, addModel } = useRoster();
+  const [view, setView] = useState<ViewMode>("editorial");
+  const [scale, setScale] = useState(1);
+  const [editMode, setEditMode] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
+
+  const flashSaved = useCallback(() => {
+    setSavedFlash(true);
+    setTimeout(() => setSavedFlash(false), 1500);
+  }, []);
+
+  const handleFieldSave = useCallback((id: string, field: keyof RosterModel, value: string) => {
+    updateModel(id, { [field]: value });
+    flashSaved();
+  }, [updateModel, flashSaved]);
+
+  const handleAddPhoto = useCallback((imagePath: string) => {
+    const newModel: RosterModel = {
+      id: generateId(),
+      name: `MODEL-${String(roster.length + 1).padStart(2, "0")}`,
+      discipline: "DJ / Model",
+      city: "\u2014",
+      token: generateToken(),
+      image: imagePath,
+      status: "Available",
+      bio: "",
+    };
+    addModel(newModel);
+    flashSaved();
+  }, [addModel, flashSaved, roster.length]);
+
+  if (!isLoaded) return null;
+
   return (
     <main className="min-h-screen bg-black text-platinum">
       {/* Header */}
@@ -69,7 +73,7 @@ export default function ModelsPage() {
       </header>
 
       {/* Title section */}
-      <section className="pt-32 pb-16 px-6 sm:px-12">
+      <section className="pt-32 pb-8 px-6 sm:px-12">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-2 h-2 bg-blood badge-glow" />
@@ -87,11 +91,110 @@ export default function ModelsPage() {
         </div>
       </section>
 
-      {/* Vertical roster */}
+      {/* Control bar */}
+      <section className="px-6 sm:px-12 pb-12">
+        <div className="max-w-[1400px] mx-auto border border-platinum/10 bg-smoke/30 px-6 py-4 flex flex-wrap items-center gap-6">
+          {/* View toggle */}
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] uppercase tracking-[0.3em] text-platinum/30">View</span>
+            <button
+              onClick={() => setView("editorial")}
+              className={`text-[11px] uppercase tracking-[0.3em] px-3 py-1.5 border transition-colors ${
+                view === "editorial"
+                  ? "border-blood/50 text-blood"
+                  : "border-platinum/10 text-platinum/30 hover:text-platinum/60"
+              }`}
+            >
+              Editorial
+            </button>
+            <button
+              onClick={() => setView("grid")}
+              className={`text-[11px] uppercase tracking-[0.3em] px-3 py-1.5 border transition-colors ${
+                view === "grid"
+                  ? "border-blood/50 text-blood"
+                  : "border-platinum/10 text-platinum/30 hover:text-platinum/60"
+              }`}
+            >
+              Grid
+            </button>
+          </div>
+
+          {/* Scale slider */}
+          <div className="flex items-center gap-3 flex-1 max-w-[200px]">
+            <span className="text-[10px] uppercase tracking-[0.3em] text-platinum/30">Scale</span>
+            <input
+              type="range"
+              min="0.6"
+              max="1.4"
+              step="0.05"
+              value={scale}
+              onChange={(e) => setScale(parseFloat(e.target.value))}
+              className="flex-1"
+            />
+            <span className="text-[10px] font-mono text-platinum/30 w-8 text-right">
+              {scale.toFixed(1)}x
+            </span>
+          </div>
+
+          {/* Edit mode toggle */}
+          <button
+            onClick={() => setEditMode(!editMode)}
+            className={`text-[11px] uppercase tracking-[0.3em] px-4 py-1.5 border transition-colors ${
+              editMode
+                ? "border-blood text-blood bg-blood/10"
+                : "border-platinum/10 text-platinum/30 hover:text-platinum/60"
+            }`}
+          >
+            {editMode ? "Editing" : "Edit Mode"}
+          </button>
+
+          {/* Saved indicator */}
+          {savedFlash && (
+            <span className="saved-flash text-[11px] uppercase tracking-[0.3em] text-green-500 font-mono">
+              Saved
+            </span>
+          )}
+        </div>
+      </section>
+
+      {/* Roster content */}
       <section className="pb-24">
-        {roster.map((model, idx) => (
-          <ModelCard key={model.token} model={model} index={idx + 1} total={roster.length} />
-        ))}
+        {view === "editorial" ? (
+          <div>
+            {roster.map((model, idx) => (
+              <ModelCard
+                key={model.id}
+                model={model}
+                index={idx + 1}
+                total={roster.length}
+                editMode={editMode}
+                onSave={handleFieldSave}
+                scale={scale}
+              />
+            ))}
+            {editMode && <AddPhotoCard onAdd={handleAddPhoto} variant="editorial" />}
+          </div>
+        ) : (
+          <div
+            className="max-w-[1400px] mx-auto px-6 sm:px-12 grid gap-6"
+            style={{
+              gridTemplateColumns: `repeat(auto-fill, minmax(${Math.round(280 * scale)}px, 1fr))`
+            }}
+          >
+            {roster.map((model, idx) => (
+              <GridCard
+                key={model.id}
+                model={model}
+                index={idx + 1}
+                total={roster.length}
+                editMode={editMode}
+                onSave={handleFieldSave}
+                scale={scale}
+              />
+            ))}
+            {editMode && <AddPhotoCard onAdd={handleAddPhoto} variant="grid" />}
+          </div>
+        )}
       </section>
 
       {/* Footer */}
@@ -107,7 +210,353 @@ export default function ModelsPage() {
   );
 }
 
-function ModelCard({ model, index, total }: { model: typeof roster[0]; index: number; total: number }) {
+/* ── Editable Field ── */
+function EditableField({
+  value,
+  onSave,
+  editMode,
+  className = "",
+  tag: Tag = "span",
+}: {
+  value: string;
+  onSave: (val: string) => void;
+  editMode: boolean;
+  className?: string;
+  tag?: "span" | "p" | "h2";
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { setDraft(value); }, [value]);
+  useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
+
+  if (editing && editMode) {
+    return (
+      <input
+        ref={inputRef}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={() => {
+          setEditing(false);
+          if (draft !== value) onSave(draft);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            setEditing(false);
+            if (draft !== value) onSave(draft);
+          }
+          if (e.key === "Escape") {
+            setEditing(false);
+            setDraft(value);
+          }
+        }}
+        className={`bg-transparent border-b border-blood/40 outline-none w-full ${className}`}
+      />
+    );
+  }
+
+  return (
+    <Tag
+      onClick={() => editMode && setEditing(true)}
+      className={`${className} ${editMode ? "editable-hover cursor-text" : ""}`}
+    >
+      {value}
+    </Tag>
+  );
+}
+
+/* ── Editable Textarea ── */
+function EditableTextarea({
+  value,
+  onSave,
+  editMode,
+  className = "",
+}: {
+  value: string;
+  onSave: (val: string) => void;
+  editMode: boolean;
+  className?: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => { setDraft(value); }, [value]);
+  useEffect(() => { if (editing) ref.current?.focus(); }, [editing]);
+
+  if (editing && editMode) {
+    return (
+      <textarea
+        ref={ref}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={() => {
+          setEditing(false);
+          if (draft !== value) onSave(draft);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            setEditing(false);
+            setDraft(value);
+          }
+        }}
+        rows={4}
+        className={`bg-transparent border border-blood/30 outline-none w-full resize-none p-2 ${className}`}
+      />
+    );
+  }
+
+  return (
+    <p
+      onClick={() => editMode && setEditing(true)}
+      className={`${className} ${editMode ? "editable-hover cursor-text" : ""}`}
+    >
+      {value}
+    </p>
+  );
+}
+
+/* ── Editable Status Select ── */
+function EditableStatus({
+  value,
+  onSave,
+  editMode,
+}: {
+  value: string;
+  onSave: (val: string) => void;
+  editMode: boolean;
+}) {
+  if (!editMode) {
+    return (
+      <span className="text-[11px] uppercase tracking-[0.5em] text-platinum/40 font-mono">
+        {value}
+      </span>
+    );
+  }
+
+  return (
+    <select
+      value={value}
+      onChange={(e) => onSave(e.target.value)}
+      className="bg-black border border-platinum/20 text-[11px] uppercase tracking-[0.3em] text-platinum/60 font-mono px-2 py-1 outline-none"
+    >
+      <option value="Available">Available</option>
+      <option value="Booked">Booked</option>
+      <option value="On Hold">On Hold</option>
+    </select>
+  );
+}
+
+/* ── Editable Photo ── */
+function EditablePhoto({
+  src,
+  alt,
+  onSave,
+  editMode,
+  className = "",
+}: {
+  src: string;
+  alt: string;
+  onSave: (newSrc: string) => void;
+  editMode: boolean;
+  className?: string;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+
+  const handleFile = async (file: File) => {
+    setUploading(true);
+    try {
+      const path = await uploadImage(file);
+      onSave(path);
+    } catch { /* silent */ }
+    setUploading(false);
+  };
+
+  return (
+    <div
+      className={`relative w-full h-full ${editMode && dragOver ? "ring-2 ring-blood ring-inset" : ""}`}
+      onDragOver={(e) => { if (editMode) { e.preventDefault(); setDragOver(true); } }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={(e) => {
+        if (!editMode) return;
+        e.preventDefault();
+        setDragOver(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file && file.type.startsWith("image/")) handleFile(file);
+      }}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        unoptimized
+        sizes="(min-width: 1024px) 33vw, 100vw"
+        className={className}
+      />
+      {editMode && (
+        <>
+          <div className={`absolute inset-0 flex items-center justify-center transition-colors ${dragOver ? "bg-black/60" : "bg-black/0 hover:bg-black/50"} group`}>
+            {uploading ? (
+              <span className="text-[12px] uppercase tracking-[0.3em] text-blood">Uploading...</span>
+            ) : dragOver ? (
+              <span className="text-[12px] uppercase tracking-[0.3em] text-blood border border-blood/40 px-4 py-2">Drop to Replace</span>
+            ) : (
+              <button
+                onClick={() => fileRef.current?.click()}
+                className="text-[12px] uppercase tracking-[0.3em] border border-platinum/40 px-4 py-2 text-platinum opacity-0 group-hover:opacity-100 transition-opacity hover:border-blood hover:text-blood"
+              >
+                Replace Photo
+              </button>
+            )}
+          </div>
+          <input
+            ref={fileRef}
+            type="file"
+            className="hidden"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFile(file);
+            }}
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ── Add Photo Card (creates a new model from a dropped/selected image) ── */
+function AddPhotoCard({
+  onAdd,
+  variant,
+}: {
+  onAdd: (imagePath: string) => void;
+  variant: "editorial" | "grid";
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFile = async (file: File) => {
+    setUploading(true);
+    try {
+      const path = await uploadImage(file);
+      onAdd(path);
+    } catch { /* silent */ }
+    setUploading(false);
+  };
+
+  const handleFiles = async (files: FileList) => {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.type.startsWith("image/")) await handleFile(file);
+    }
+  };
+
+  if (variant === "grid") {
+    return (
+      <div
+        onClick={() => fileRef.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+        }}
+        className={`border border-dashed aspect-[3/4] flex flex-col items-center justify-center gap-3 transition-colors cursor-pointer ${
+          dragOver ? "border-blood bg-blood/5" : "border-platinum/15 hover:border-blood/40"
+        }`}
+      >
+        {uploading ? (
+          <span className="text-[11px] uppercase tracking-[0.3em] text-blood">Adding...</span>
+        ) : (
+          <>
+            <div className="w-10 h-10 border border-platinum/20 flex items-center justify-center">
+              <span className="text-platinum/30 text-[22px]">+</span>
+            </div>
+            <span className="text-[11px] uppercase tracking-[0.3em] text-platinum/25">
+              Add Photo
+            </span>
+            <span className="text-[9px] text-platinum/15 uppercase tracking-[0.2em]">
+              Drop or click
+            </span>
+          </>
+        )}
+        <input
+          ref={fileRef}
+          type="file"
+          className="hidden"
+          accept="image/*"
+          multiple
+          onChange={(e) => {
+            if (e.target.files?.length) handleFiles(e.target.files);
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Editorial variant — full-width drop strip
+  return (
+    <div
+      onClick={() => fileRef.current?.click()}
+      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setDragOver(false);
+        if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+      }}
+      className={`max-w-[1400px] mx-auto px-6 sm:px-12 py-16 border-t border-dashed flex items-center justify-center gap-4 transition-colors cursor-pointer ${
+        dragOver ? "border-blood bg-blood/5" : "border-platinum/10 hover:border-blood/30"
+      }`}
+    >
+      {uploading ? (
+        <span className="text-[12px] uppercase tracking-[0.3em] text-blood">Adding...</span>
+      ) : (
+        <>
+          <div className="w-8 h-8 border border-platinum/20 flex items-center justify-center">
+            <span className="text-platinum/30 text-[18px]">+</span>
+          </div>
+          <span className="text-[12px] uppercase tracking-[0.3em] text-platinum/25">
+            Add Photo &mdash; drop or click
+          </span>
+        </>
+      )}
+      <input
+        ref={fileRef}
+        type="file"
+        className="hidden"
+        accept="image/*"
+        multiple
+        onChange={(e) => {
+          if (e.target.files?.length) handleFiles(e.target.files);
+        }}
+      />
+    </div>
+  );
+}
+
+/* ── Editorial Model Card (Vertical view) ── */
+function ModelCard({
+  model,
+  index,
+  total,
+  editMode,
+  onSave,
+  scale,
+}: {
+  model: RosterModel;
+  index: number;
+  total: number;
+  editMode: boolean;
+  onSave: (id: string, field: keyof RosterModel, value: string) => void;
+  scale: number;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -127,27 +576,32 @@ function ModelCard({ model, index, total }: { model: typeof roster[0]; index: nu
       ref={ref}
       id={model.token}
       className="border-t border-platinum/5 scroll-mt-20"
+      style={{ marginBottom: `${Math.round(48 * scale)}px` }}
     >
       <div className="max-w-[1400px] mx-auto px-6 sm:px-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-12 py-12 lg:py-0">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-12 py-16 lg:py-0">
 
-          {/* Image column — tall portrait */}
+          {/* Image column */}
           <div className="lg:col-span-6 relative overflow-hidden">
-            <div className="aspect-[3/4] lg:aspect-auto lg:h-[85vh] relative bg-smoke">
-              <img
+            <div
+              className="aspect-[3/4] lg:aspect-auto relative bg-smoke"
+              style={{ height: `${Math.round(85 * scale)}vh` }}
+            >
+              <EditablePhoto
                 src={model.image}
                 alt={model.name}
+                onSave={(val) => onSave(model.id, "image", val)}
+                editMode={editMode}
                 className={`model-portrait w-full h-full transition-all duration-1000 ${
                   visible ? "opacity-100 scale-100" : "opacity-0 scale-[1.03]"
                 }`}
               />
-              {/* Bottom gradient */}
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent lg:hidden" />
             </div>
           </div>
 
           {/* Details column */}
-          <div className="lg:col-span-6 flex flex-col justify-center py-8 lg:py-24">
+          <div className="lg:col-span-6 flex flex-col justify-center py-12 lg:py-24">
             <div className={`transition-all duration-1000 delay-200 ${
               visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}>
@@ -162,31 +616,54 @@ function ModelCard({ model, index, total }: { model: typeof roster[0]; index: nu
                   model.status === "Available" ? "bg-green-500" :
                   model.status === "Booked" ? "bg-blood" : "bg-yellow-500"
                 }`} />
-                <span className="text-[11px] uppercase tracking-[0.5em] text-platinum/40 font-mono">
-                  {model.status}
-                </span>
+                <EditableStatus
+                  value={model.status}
+                  onSave={(val) => onSave(model.id, "status", val)}
+                  editMode={editMode}
+                />
               </div>
 
               {/* Name */}
-              <h2 className="mt-6 text-[clamp(32px,4vw,64px)] font-black uppercase leading-[0.9] tracking-tight">
-                {model.name}
-              </h2>
+              <div className="mt-6">
+                <EditableField
+                  value={model.name}
+                  onSave={(val) => onSave(model.id, "name", val)}
+                  editMode={editMode}
+                  className="text-[clamp(32px,4vw,64px)] font-black uppercase leading-[0.9] tracking-tight block"
+                  tag="h2"
+                />
+              </div>
 
               {/* Discipline */}
-              <p className="mt-4 text-[14px] sm:text-[16px] uppercase tracking-[0.3em] text-blood/70">
-                {model.discipline}
-              </p>
+              <div className="mt-4">
+                <EditableField
+                  value={model.discipline}
+                  onSave={(val) => onSave(model.id, "discipline", val)}
+                  editMode={editMode}
+                  className="text-[14px] sm:text-[16px] uppercase tracking-[0.3em] text-blood/70 block"
+                />
+              </div>
 
               {/* Bio */}
-              <p className="mt-8 text-[14px] sm:text-[15px] text-platinum/50 leading-relaxed font-legal max-w-md">
-                {model.bio}
-              </p>
+              <div className="mt-8">
+                <EditableTextarea
+                  value={model.bio}
+                  onSave={(val) => onSave(model.id, "bio", val)}
+                  editMode={editMode}
+                  className="text-[14px] sm:text-[15px] text-platinum/50 leading-relaxed font-legal max-w-md"
+                />
+              </div>
 
               {/* Metadata grid */}
               <div className="mt-10 space-y-3 border-t border-platinum/10 pt-6">
                 <div className="flex justify-between text-[12px] uppercase tracking-[0.3em]">
                   <span className="text-platinum/30">Base</span>
-                  <span className="text-platinum/60">{model.city}</span>
+                  <EditableField
+                    value={model.city}
+                    onSave={(val) => onSave(model.id, "city", val)}
+                    editMode={editMode}
+                    className="text-platinum/60"
+                  />
                 </div>
                 <div className="flex justify-between text-[12px] uppercase tracking-[0.3em]">
                   <span className="text-platinum/30">License Token</span>
@@ -209,6 +686,98 @@ function ModelCard({ model, index, total }: { model: typeof roster[0]; index: nu
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+/* ── Grid Card (Horizontal view) ── */
+function GridCard({
+  model,
+  index,
+  total,
+  editMode,
+  onSave,
+  scale,
+}: {
+  model: RosterModel;
+  index: number;
+  total: number;
+  editMode: boolean;
+  onSave: (id: string, field: keyof RosterModel, value: string) => void;
+  scale: number;
+}) {
+  return (
+    <article
+      id={`grid-${model.token}`}
+      className="border border-platinum/10 overflow-hidden group"
+    >
+      {/* Portrait */}
+      <div className="relative aspect-[3/4] bg-smoke overflow-hidden">
+        <EditablePhoto
+          src={model.image}
+          alt={model.name}
+          onSave={(val) => onSave(model.id, "image", val)}
+          editMode={editMode}
+          className="model-portrait w-full h-full transition-transform duration-700 group-hover:scale-105"
+        />
+
+        {/* Overlay on hover (only when not in edit mode to avoid conflict) */}
+        {!editMode && (
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        )}
+
+        {/* Index badge */}
+        <div className="absolute top-3 left-3">
+          <span className="text-[10px] font-mono text-platinum/30 uppercase tracking-[0.2em]">
+            {String(index).padStart(2, "0")}/{String(total).padStart(2, "0")}
+          </span>
+        </div>
+
+        {/* Status badge */}
+        <div className="absolute top-3 right-3 flex items-center gap-2">
+          <div className={`w-1.5 h-1.5 ${
+            model.status === "Available" ? "bg-green-500" :
+            model.status === "Booked" ? "bg-blood" : "bg-yellow-500"
+          }`} />
+          <EditableStatus
+            value={model.status}
+            onSave={(val) => onSave(model.id, "status", val)}
+            editMode={editMode}
+          />
+        </div>
+
+        {/* Bottom overlay details */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+          <p className="text-[12px] text-platinum/50 leading-relaxed font-legal line-clamp-3">
+            {model.bio}
+          </p>
+        </div>
+      </div>
+
+      {/* Card details */}
+      <div className="p-4 space-y-2">
+        <EditableField
+          value={model.name}
+          onSave={(val) => onSave(model.id, "name", val)}
+          editMode={editMode}
+          className="text-[16px] font-bold uppercase tracking-[0.15em] block"
+        />
+        <EditableField
+          value={model.discipline}
+          onSave={(val) => onSave(model.id, "discipline", val)}
+          editMode={editMode}
+          className="text-[11px] uppercase tracking-[0.3em] text-blood/60 block"
+        />
+        <div className="flex justify-between items-center pt-2 border-t border-platinum/5">
+          <EditableField
+            value={model.city}
+            onSave={(val) => onSave(model.id, "city", val)}
+            editMode={editMode}
+            className="text-[11px] text-platinum/30 uppercase tracking-[0.2em]"
+          />
+          <span className="text-[10px] font-mono text-platinum/20">{model.token}</span>
         </div>
       </div>
     </article>

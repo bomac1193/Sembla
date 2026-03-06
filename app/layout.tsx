@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { RosterProvider } from "@/lib/RosterContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,7 +11,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="bg-black text-platinum antialiased">
-        <div className="relative min-h-screen flex flex-col">{children}</div>
+        <RosterProvider>
+          <div className="relative min-h-screen flex flex-col">{children}</div>
+        </RosterProvider>
       </body>
     </html>
   );

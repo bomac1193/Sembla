@@ -1,19 +1,27 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { useRoster } from "@/lib/RosterContext";
+import { generateToken, generateId, compressImage } from "@/lib/roster";
+import type { RosterModel } from "@/lib/roster";
 
-interface RosterEntry {
-  name: string;
-  discipline: string;
-  city: string;
-  bio: string;
-  imagePreview: string;
-  file: File;
+async function uploadImage(file: File): Promise<string> {
+  try {
+    const formData = new FormData();
+    formData.append("image", file);
+    const res = await fetch("/api/roster/upload", { method: "POST", body: formData });
+    if (res.ok) {
+      const data = await res.json();
+      return data.path;
+    }
+  } catch { /* fall through */ }
+  return compressImage(file, 800, 0.7);
 }
 
 export default function RosterUploadPage() {
-  const [entries, setEntries] = useState<RosterEntry[]>([]);
+  const { roster, addModel, deleteModel, updateModel, resetToDefaults, isLoaded } = useRoster();
   const [name, setName] = useState("");
   const [discipline, setDiscipline] = useState("");
   const [city, setCity] = useState("");
@@ -21,7 +29,9 @@ export default function RosterUploadPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadResult, setUploadResult] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleImageSelect = (file: File) => {
@@ -31,20 +41,50 @@ export default function RosterUploadPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleAdd = () => {
-    if (!name || !selectedFile || !imagePreview) return;
+  const handleAdd = async () => {
+    if (!name || !selectedFile) return;
+    setUploading(true);
+    setFeedback(null);
 
-    setEntries((prev) => [
-      ...prev,
-      {
-        name,
-        discipline: discipline || "DJ / Model",
-        city: city || "—",
-        bio: bio || "",
-        imagePreview,
-        file: selectedFile
+    let imagePath = "";
+
+    // Try filesystem upload first
+    try {
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+      const res = await fetch("/api/roster/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        imagePath = data.path;
       }
-    ]);
+    } catch {
+      // Filesystem upload failed — fall through to base64
+    }
+
+    // Fallback: compress to base64
+    if (!imagePath) {
+      try {
+        imagePath = await compressImage(selectedFile, 800, 0.7);
+      } catch {
+        setFeedback("Failed to process image.");
+        setUploading(false);
+        return;
+      }
+    }
+
+    const newModel: RosterModel = {
+      id: generateId(),
+      name,
+      discipline: discipline || "DJ / Model",
+      city: city || "—",
+      token: generateToken(),
+      image: imagePath,
+      status: "Available",
+      bio: bio || "",
+    };
+
+    addModel(newModel);
+    setFeedback(`${name} added to roster.`);
 
     // Reset form
     setName("");
@@ -54,55 +94,22 @@ export default function RosterUploadPage() {
     setImagePreview(null);
     setSelectedFile(null);
     if (fileRef.current) fileRef.current.value = "";
+    setUploading(false);
   };
 
-  const handleRemove = (idx: number) => {
-    setEntries((prev) => prev.filter((_, i) => i !== idx));
+  const handleDelete = (id: string) => {
+    deleteModel(id);
+    setConfirmDelete(null);
+    setFeedback("Model removed from roster.");
   };
 
-  const handlePublish = async () => {
-    setUploading(true);
-    setUploadResult(null);
-
-    try {
-      for (const entry of entries) {
-        const formData = new FormData();
-        formData.append("image", entry.file);
-        formData.append(
-          "options",
-          JSON.stringify({
-            name: entry.name,
-            discipline: entry.discipline,
-            city: entry.city,
-            bio: entry.bio,
-            gender: "androgynous",
-            skinTone: "neutral",
-            vibe: "editorial",
-            email: "",
-            consentName: entry.name,
-            consentAgree: true,
-            consentJson: JSON.stringify({
-              signer: entry.name,
-              timestamp: new Date().toISOString(),
-              rights: "digital_likeness",
-              retention: "indefinite",
-              agency: "SEMBLA"
-            }),
-            qr: "roster-upload"
-          })
-        );
-
-        await fetch("/api/generate", { method: "POST", body: formData });
-      }
-
-      setUploadResult(`${entries.length} model(s) published to roster.`);
-      setEntries([]);
-    } catch {
-      setUploadResult("Upload failed. Check Supabase/Replicate config.");
-    } finally {
-      setUploading(false);
-    }
+  const handleReset = () => {
+    resetToDefaults();
+    setConfirmReset(false);
+    setFeedback("Roster reset to defaults.");
   };
+
+  if (!isLoaded) return null;
 
   return (
     <main className="min-h-screen bg-black text-platinum">
@@ -130,12 +137,20 @@ export default function RosterUploadPage() {
             </span>
           </div>
           <h1 className="text-[clamp(36px,5vw,64px)] font-black uppercase leading-[0.9] tracking-tight">
-            Roster Upload
+            Roster Management
           </h1>
           <p className="mt-4 text-[14px] text-platinum/40 font-legal">
-            Add models to the agency roster. Each upload generates a consent chain and license token.
+            Add, remove, and manage models on the agency roster. Changes persist in browser storage.
           </p>
         </div>
+
+        {/* Feedback */}
+        {feedback && (
+          <div className="mb-8 border border-platinum/10 p-4 text-[13px] text-platinum/60 font-mono flex items-center justify-between">
+            <span>{feedback}</span>
+            <button onClick={() => setFeedback(null)} className="text-platinum/30 hover:text-platinum text-[16px]">&times;</button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Upload form */}
@@ -155,7 +170,14 @@ export default function RosterUploadPage() {
                 className="relative aspect-[3/4] border border-dashed border-platinum/20 bg-smoke overflow-hidden hover:border-blood/40 transition-colors"
               >
                 {imagePreview ? (
-                  <img src={imagePreview} alt="Preview" className="model-portrait w-full h-full" />
+                  <Image
+                    src={imagePreview}
+                    alt="Preview"
+                    fill
+                    unoptimized
+                    sizes="(min-width: 1024px) 30vw, 100vw"
+                    className="model-portrait w-full h-full"
+                  />
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
                     <div className="w-8 h-8 border border-platinum/20 flex items-center justify-center">
@@ -221,76 +243,251 @@ export default function RosterUploadPage() {
 
               <button
                 onClick={handleAdd}
-                disabled={!name || !selectedFile}
+                disabled={!name || !selectedFile || uploading}
                 className="w-full border border-platinum/30 py-3.5 text-[12px] uppercase tracking-[0.4em] hover:border-blood hover:text-blood transition-colors disabled:opacity-20 disabled:hover:border-platinum/30 disabled:hover:text-platinum"
               >
-                Add to Queue
+                {uploading ? "Adding..." : "Add to Roster"}
               </button>
             </div>
           </div>
 
-          {/* Queue / Preview */}
+          {/* Roster list */}
           <div className="lg:col-span-7">
-            <p className="text-[12px] uppercase tracking-[0.4em] text-platinum/50 mb-6">
-              Queue &middot; {entries.length} model{entries.length !== 1 ? "s" : ""}
-            </p>
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-[12px] uppercase tracking-[0.4em] text-platinum/50">
+                Current Roster &middot; {roster.length} model{roster.length !== 1 ? "s" : ""}
+              </p>
 
-            {entries.length === 0 ? (
-              <div className="border border-platinum/5 bg-smoke/50 aspect-[3/4] max-h-[400px] flex items-center justify-center">
+              {/* Reset button */}
+              {confirmReset ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] text-platinum/40">Reset all to defaults?</span>
+                  <button
+                    onClick={handleReset}
+                    className="text-[11px] uppercase tracking-[0.3em] text-blood border border-blood/40 px-3 py-1"
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onClick={() => setConfirmReset(false)}
+                    className="text-[11px] uppercase tracking-[0.3em] text-platinum/40 border border-platinum/10 px-3 py-1"
+                  >
+                    No
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setConfirmReset(true)}
+                  className="text-[11px] uppercase tracking-[0.3em] text-platinum/30 hover:text-platinum/60 transition-colors"
+                >
+                  Reset to Defaults
+                </button>
+              )}
+            </div>
+
+            {roster.length === 0 ? (
+              <div className="border border-platinum/5 bg-smoke/50 py-24 flex items-center justify-center">
                 <span className="text-[12px] uppercase tracking-[0.4em] text-platinum/15">
-                  No models queued
+                  Roster empty
                 </span>
               </div>
             ) : (
-              <div className="space-y-4">
-                {entries.map((entry, idx) => (
-                  <div key={idx} className="border border-platinum/10 bg-smoke/30 flex items-stretch overflow-hidden">
-                    {/* Thumbnail */}
-                    <div className="w-24 sm:w-32 flex-shrink-0">
-                      <img
-                        src={entry.imagePreview}
-                        alt={entry.name}
-                        className="model-portrait w-full h-full min-h-[120px]"
-                      />
-                    </div>
-                    {/* Info */}
-                    <div className="flex-1 p-4 sm:p-6 flex flex-col justify-center gap-1">
-                      <p className="text-[16px] font-bold uppercase tracking-[0.2em]">{entry.name}</p>
-                      <p className="text-[12px] text-platinum/40 uppercase tracking-[0.2em]">{entry.discipline}</p>
-                      <p className="text-[11px] text-platinum/30 font-mono">{entry.city}</p>
-                    </div>
-                    {/* Remove */}
-                    <button
-                      onClick={() => handleRemove(idx)}
-                      className="px-4 text-platinum/20 hover:text-blood transition-colors text-[18px]"
-                      title="Remove"
-                    >
-                      &times;
-                    </button>
-                  </div>
+              <div className="space-y-3">
+                {roster.map((model) => (
+                  <RosterItem
+                    key={model.id}
+                    model={model}
+                    onUpdate={(field, value) => {
+                      updateModel(model.id, { [field]: value });
+                      setFeedback(`${model.name} updated.`);
+                    }}
+                    onDelete={() => handleDelete(model.id)}
+                    confirmingDelete={confirmDelete === model.id}
+                    onConfirmDelete={() => setConfirmDelete(model.id)}
+                    onCancelDelete={() => setConfirmDelete(null)}
+                  />
                 ))}
-
-                {/* Publish */}
-                <div className="pt-6 border-t border-platinum/10">
-                  <button
-                    onClick={handlePublish}
-                    disabled={uploading}
-                    className="border border-blood/50 px-10 py-4 text-[12px] uppercase tracking-[0.4em] text-blood hover:bg-blood hover:text-black transition-all disabled:opacity-40"
-                  >
-                    {uploading ? "Publishing..." : `Publish ${entries.length} to Roster`}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {uploadResult && (
-              <div className="mt-6 border border-platinum/10 p-4 text-[13px] text-platinum/60 font-mono">
-                {uploadResult}
               </div>
             )}
           </div>
         </div>
       </div>
     </main>
+  );
+}
+
+/* ── Inline editable text field for admin list ── */
+function InlineEdit({
+  value,
+  onSave,
+  className = "",
+}: {
+  value: string;
+  onSave: (val: string) => void;
+  className?: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { setDraft(value); }, [value]);
+  useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={() => {
+          setEditing(false);
+          if (draft !== value) onSave(draft);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") { setEditing(false); if (draft !== value) onSave(draft); }
+          if (e.key === "Escape") { setEditing(false); setDraft(value); }
+        }}
+        className={`bg-transparent border-b border-blood/40 outline-none ${className}`}
+      />
+    );
+  }
+
+  return (
+    <span
+      onClick={() => setEditing(true)}
+      className={`editable-hover cursor-text ${className}`}
+    >
+      {value}
+    </span>
+  );
+}
+
+/* ── Single roster item row with clickable photo + inline editing ── */
+function RosterItem({
+  model,
+  onUpdate,
+  onDelete,
+  confirmingDelete,
+  onConfirmDelete,
+  onCancelDelete,
+}: {
+  model: RosterModel;
+  onUpdate: (field: keyof RosterModel, value: string) => void;
+  onDelete: () => void;
+  confirmingDelete: boolean;
+  onConfirmDelete: () => void;
+  onCancelDelete: () => void;
+}) {
+  const photoRef = useRef<HTMLInputElement>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  const handlePhotoChange = async (file: File) => {
+    setUploadingPhoto(true);
+    try {
+      const path = await uploadImage(file);
+      onUpdate("image", path);
+    } catch { /* silent */ }
+    setUploadingPhoto(false);
+  };
+
+  const [dragOver, setDragOver] = useState(false);
+
+  return (
+    <div className="border border-platinum/10 bg-smoke/30 flex items-stretch overflow-hidden">
+      {/* Clickable + droppable thumbnail */}
+      <div
+        className={`w-20 sm:w-28 flex-shrink-0 relative group cursor-pointer ${dragOver ? "ring-2 ring-blood ring-inset" : ""}`}
+        onClick={() => photoRef.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          const file = e.dataTransfer.files?.[0];
+          if (file && file.type.startsWith("image/")) handlePhotoChange(file);
+        }}
+      >
+        <Image
+          src={model.image}
+          alt={model.name}
+          fill
+          unoptimized
+          sizes="112px"
+          className="model-portrait w-full h-full min-h-[100px]"
+        />
+        <div className={`absolute inset-0 flex items-center justify-center transition-colors ${dragOver ? "bg-black/60" : "bg-black/0 group-hover:bg-black/50"}`}>
+          <span className={`text-[9px] uppercase tracking-[0.2em] transition-opacity ${dragOver ? "opacity-100 text-blood" : "opacity-0 group-hover:opacity-100"} ${uploadingPhoto ? "text-blood" : "text-platinum/70"}`}>
+            {uploadingPhoto ? "..." : dragOver ? "Drop" : "Replace"}
+          </span>
+        </div>
+        <input
+          ref={photoRef}
+          type="file"
+          className="hidden"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handlePhotoChange(file);
+          }}
+        />
+      </div>
+
+      {/* Editable info */}
+      <div className="flex-1 p-4 sm:p-5 flex flex-col justify-center gap-1">
+        <InlineEdit
+          value={model.name}
+          onSave={(val) => onUpdate("name", val)}
+          className="text-[15px] font-bold uppercase tracking-[0.15em]"
+        />
+        <InlineEdit
+          value={model.discipline}
+          onSave={(val) => onUpdate("discipline", val)}
+          className="text-[11px] text-platinum/40 uppercase tracking-[0.2em]"
+        />
+        <div className="flex items-center gap-4 mt-1">
+          <InlineEdit
+            value={model.city}
+            onSave={(val) => onUpdate("city", val)}
+            className="text-[10px] text-platinum/30 font-mono"
+          />
+          <span className="text-[10px] text-platinum/20 font-mono">{model.token}</span>
+          <select
+            value={model.status}
+            onChange={(e) => onUpdate("status", e.target.value)}
+            className="bg-transparent text-[10px] text-platinum/30 uppercase outline-none border-none cursor-pointer"
+          >
+            <option value="Available">Available</option>
+            <option value="Booked">Booked</option>
+            <option value="On Hold">On Hold</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Delete */}
+      {confirmingDelete ? (
+        <div className="flex flex-col items-center justify-center gap-1 px-4">
+          <button
+            onClick={onDelete}
+            className="text-[10px] uppercase tracking-[0.2em] text-blood border border-blood/40 px-3 py-1 hover:bg-blood hover:text-black transition-all"
+          >
+            Delete
+          </button>
+          <button
+            onClick={onCancelDelete}
+            className="text-[10px] uppercase tracking-[0.2em] text-platinum/30 px-3 py-1"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={onConfirmDelete}
+          className="px-4 text-platinum/20 hover:text-blood transition-colors text-[18px]"
+          title="Remove from roster"
+        >
+          &times;
+        </button>
+      )}
+    </div>
   );
 }

@@ -14,7 +14,7 @@ module.exports = {
       colors: {
         black: "#000000",
         platinum: "#D8D8D8",
-        blood: "#9B0000",
+        blood: "#5B161C",
         white: "#FFFFFF",
         ash: "#1A1A1A",
         smoke: "#0D0D0D"

@@ -10,3 +10,5 @@ pnpm-lock.yaml
 *.log
 public/models/*
 !public/models/.gitkeep
+public/fonts/Canela*
+Sembla Oxblood theme/

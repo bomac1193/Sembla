@@ -34,7 +34,9 @@ export default function ResultPage({ searchParams }: Props) {
           <div className="border border-platinum/30 bg-black/80 p-6 space-y-4">
             <div>
               <p className="text-xs uppercase tracking-[0.18em] text-platinum/70">Result</p>
-              <h1 className="text-3xl font-semibold text-platinum">Your face value is… {descriptor}</h1>
+              <h1 className="font-canela-display text-[clamp(34px,4vw,48px)] leading-[0.96] tracking-[-0.04em] text-platinum">
+                Your face value is… {descriptor}
+              </h1>
               <p className="text-sm text-platinum/70">
                 We watermark every render and attach a UUID license token for bookings and exports.
               </p>
@@ -67,7 +69,7 @@ export default function ResultPage({ searchParams }: Props) {
               </Link>
             </div>
             <div className="border border-platinum/20 bg-black/70 p-4">
-              <p className="text-sm font-semibold text-platinum">Book this face</p>
+              <p className="font-canela-text text-[24px] leading-none tracking-[-0.03em] text-platinum">Book this face</p>
               <p className="text-sm text-platinum/70">
                 Send to the agency inbox with the token above to request rights and campaign usage.
               </p>

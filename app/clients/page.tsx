@@ -8,7 +8,7 @@ export default function ClientsPage() {
   return (
     <main className="min-h-screen bg-black text-platinum px-[5vw] py-24">
       <header className="space-y-4 border-b border-platinum/20 pb-8">
-        <p className="text-[32px] font-medium uppercase tracking-[0.3em]">Clients</p>
+        <h1 className="font-canela-display text-[clamp(34px,4vw,56px)] leading-[0.96] tracking-[-0.04em] text-platinum">Clients</h1>
         <p className="text-platinum/70 text-[16px]">Active engagements. Face value deals. Zero negotiation.</p>
       </header>
 

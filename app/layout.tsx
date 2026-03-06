@@ -3,7 +3,7 @@ import { RosterProvider } from "@/lib/RosterContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SEMBLA — Exclusive Digital Agency",
+  title: "Sembla",
   description: "Curated roster of supermodel DJs. AI likeness licensing with auditable consent chains. Not a marketplace. An agency."
 };
 

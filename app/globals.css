@@ -2,6 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Canela Display Families ── */
+@font-face { font-family: "Canela Deck"; src: url("/fonts/CanelaDeck-Light-Trial.otf") format("opentype"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela Deck"; src: url("/fonts/CanelaDeck-Regular-Trial.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela Deck"; src: url("/fonts/CanelaDeck-Medium-Trial.otf") format("opentype"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela Deck"; src: url("/fonts/CanelaDeck-Bold-Trial.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela Deck"; src: url("/fonts/CanelaDeck-Black-Trial.otf") format("opentype"); font-weight: 900; font-style: normal; font-display: swap; }
+
+@font-face { font-family: "Canela"; src: url("/fonts/Canela-Light-Trial.otf") format("opentype"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela"; src: url("/fonts/Canela-Regular.ttf") format("truetype"), url("/fonts/Canela-Regular-Trial.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela"; src: url("/fonts/Canela-Medium-Trial.otf") format("opentype"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela"; src: url("/fonts/Canela-Bold-Trial.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela"; src: url("/fonts/Canela-Black-Trial.otf") format("opentype"); font-weight: 900; font-style: normal; font-display: swap; }
+
+@font-face { font-family: "Canela Text"; src: url("/fonts/CanelaText-Light-Trial.otf") format("opentype"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela Text"; src: url("/fonts/CanelaText-Regular-Trial.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela Text"; src: url("/fonts/CanelaText-Medium-Trial.otf") format("opentype"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela Text"; src: url("/fonts/CanelaText-Bold-Trial.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela Text"; src: url("/fonts/CanelaText-Black-Trial.otf") format("opentype"); font-weight: 900; font-style: normal; font-display: swap; }
+
+@font-face { font-family: "Canela Condensed"; src: url("/fonts/CanelaCondensed-Light-Trial.otf") format("opentype"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela Condensed"; src: url("/fonts/CanelaCondensed-Regular-Trial.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela Condensed"; src: url("/fonts/CanelaCondensed-Medium-Trial.otf") format("opentype"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela Condensed"; src: url("/fonts/CanelaCondensed-Bold-Trial.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Canela Condensed"; src: url("/fonts/CanelaCondensed-Black-Trial.otf") format("opentype"); font-weight: 900; font-style: normal; font-display: swap; }
+
 /* ── Sohne Font Family ── */
 @font-face { font-family: "Sohne"; src: url("/fonts/sohne-extralight.otf") format("opentype"); font-weight: 200; font-style: normal; font-display: swap; }
 @font-face { font-family: "Sohne"; src: url("/fonts/sohne-light.otf") format("opentype"); font-weight: 300; font-style: normal; font-display: swap; }
@@ -17,6 +42,10 @@
 @font-face { font-family: "Sohne Mono"; src: url("/fonts/sohne-mono-semibold.otf") format("opentype"); font-weight: 600; font-style: normal; font-display: swap; }
 
 :root {
+  --font-body: "Sohne", "Helvetica Neue", sans-serif;
+  --font-heading-display: "Canela", "Canela Text", Georgia, serif;
+  --font-heading: "Canela", "Canela Text", Georgia, serif;
+  --font-heading-compact: "Canela Condensed", "Canela", Georgia, serif;
   color-scheme: dark;
   background-color: #000000;
 }
@@ -27,24 +56,62 @@
 
 body {
   margin: 0;
-  font-family: "Sohne", "Helvetica Neue", sans-serif;
+  font-family: var(--font-body);
   background: #000000;
   color: #d8d8d8;
   min-height: 100vh;
-  cursor: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' stroke='%23d8d8d8' stroke-width='2' fill='none' stroke-linecap='square' stroke-linejoin='miter'%3e%3cpath d='M12 1v22M1 12h22'/%3e%3c/svg%3e")
-      12 12,
-    crosshair;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(91, 22, 28, 0.58) #0d0d0d;
 }
 
-a,
-button,
-input,
-textarea,
-select,
-[role="button"] {
-  cursor: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' stroke='%239b0000' stroke-width='2' fill='none' stroke-linecap='square' stroke-linejoin='miter'%3e%3cpath d='M12 1v22M1 12h22'/%3e%3c/svg%3e")
-      12 12,
-    crosshair;
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0d0d0d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(91, 22, 28, 0.58);
+  border: 1px solid #0d0d0d;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(91, 22, 28, 0.8);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1, "kern" 1;
+}
+
+h1 {
+  font-family: var(--font-heading-display);
+  font-weight: 400;
+}
+
+.font-canela-display {
+  font-family: var(--font-heading-display);
+  font-weight: 400;
+}
+
+.font-canela-text {
+  font-family: "Canela Text", var(--font-heading);
+  font-weight: 400;
+}
+
+.font-canela-condensed {
+  font-family: var(--font-heading-compact);
+  font-weight: 400;
 }
 
 .no-highlight {
@@ -83,7 +150,7 @@ select,
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(155, 0, 0, 0.03) 50%,
+    rgba(91, 22, 28, 0.03) 50%,
     transparent 100%
   );
   height: 4px;
@@ -109,13 +176,13 @@ select,
 
 /* Agency badge pulse */
 .badge-glow {
-  box-shadow: 0 0 0 0 rgba(155, 0, 0, 0.4);
+  box-shadow: 0 0 0 0 rgba(91, 22, 28, 0.4);
   animation: badgePulse 3s ease-in-out infinite;
 }
 
 @keyframes badgePulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(155, 0, 0, 0.4); }
-  50% { box-shadow: 0 0 20px 4px rgba(155, 0, 0, 0.15); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(91, 22, 28, 0.4); }
+  50% { box-shadow: 0 0 20px 4px rgba(91, 22, 28, 0.15); }
 }
 
 /* Custom range slider */
@@ -143,14 +210,14 @@ input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 10px;
   height: 10px;
-  background: #9b0000;
+  background: #5b161c;
   margin-top: -5px;
 }
 
 input[type="range"]::-moz-range-thumb {
   width: 10px;
   height: 10px;
-  background: #9b0000;
+  background: #5b161c;
   border: none;
 }
 
@@ -161,7 +228,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .editable-hover:hover {
-  border-bottom-color: rgba(155, 0, 0, 0.4);
+  border-bottom-color: rgba(91, 22, 28, 0.4);
 }
 
 /* Saved flash */

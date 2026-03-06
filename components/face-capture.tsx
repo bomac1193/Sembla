@@ -108,7 +108,7 @@ export default function FaceCapture({ onCapture, onFaceReady }: Props) {
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div
           className={`h-40 w-40 border ${
-            faceDetected ? "border-blood shadow-[0_0_24px_rgba(155,0,0,0.6)]" : "border-platinum/30"
+            faceDetected ? "border-blood shadow-[0_0_24px_rgba(91,22,28,0.6)]" : "border-platinum/30"
           }`}
         />
       </div>

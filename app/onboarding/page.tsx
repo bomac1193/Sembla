@@ -149,7 +149,9 @@ function OnboardingContent() {
                 <p className="uppercase tracking-[0.18em] text-xs text-platinum/70">
                   Capture
                 </p>
-                <h1 className="text-3xl font-semibold">Upload or shoot a selfie</h1>
+                <h1 className="font-canela-display text-[clamp(34px,4vw,48px)] leading-[0.95] tracking-[-0.04em] text-platinum">
+                  Upload or shoot a selfie
+                </h1>
               </div>
               <span className="px-3 py-1 text-xs uppercase tracking-[0.18em] border border-platinum/30 text-platinum">
                 Live
@@ -296,7 +298,9 @@ function OnboardingContent() {
           <div className="border border-platinum/30 bg-black/80 p-6 lg:p-8 space-y-6">
             <div>
               <p className="uppercase tracking-[0.18em] text-xs text-platinum/70">Preview</p>
-              <h2 className="text-2xl font-semibold text-platinum">AI Avatar Result</h2>
+              <h2 className="font-canela-text text-[30px] leading-[0.96] tracking-[-0.03em] text-platinum">
+                Ai avatar result
+              </h2>
               <p className="text-sm text-platinum/70">
                 We&apos;ll watermark and mint a license token automatically. Expect delivery in
                 under a minute.

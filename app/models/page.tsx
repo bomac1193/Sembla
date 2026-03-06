@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { LayoutGrid, Rows3 } from "lucide-react";
+import { normalizeDiscipline, toDisplayCase } from "@/lib/display";
 import { useRoster } from "@/lib/RosterContext";
 import { compressImage, generateToken, generateId } from "@/lib/roster";
 import type { RosterModel } from "@/lib/roster";
@@ -61,12 +63,13 @@ export default function ModelsPage() {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-black/95 backdrop-blur-sm border-b border-platinum/10 flex items-center px-6 sm:px-12 z-50">
         <div className="w-full flex items-center justify-between max-w-[1400px] mx-auto">
-          <Link href="/" className="text-platinum text-[18px] font-bold tracking-[0.5em] uppercase">
-            SEMBLA
+          <Link href="/" className="font-canela-display text-[30px] leading-none tracking-[-0.04em] text-platinum">
+            Sembla
           </Link>
-          <nav className="flex items-center gap-8 text-[11px] uppercase tracking-[0.4em]">
-            <Link href="/" className="text-platinum/50 hover:text-platinum transition-colors">Home</Link>
-            <Link href="/models" className="text-platinum transition-colors">Roster</Link>
+          <nav className="flex items-center gap-6 text-[11px] tracking-[0.18em] sm:gap-8">
+            <Link href="/offerings" className="text-platinum/50 hover:text-platinum transition-colors">Offerings</Link>
+            <Link href="/models" className="text-platinum transition-colors">Selected Talent</Link>
+            <Link href="/inquiry" className="text-platinum/50 hover:text-platinum transition-colors">Inquiry</Link>
             <Link href="/roster/upload" className="text-blood/70 hover:text-blood transition-colors">Admin</Link>
           </nav>
         </div>
@@ -75,14 +78,8 @@ export default function ModelsPage() {
       {/* Title section */}
       <section className="pt-32 pb-8 px-6 sm:px-12">
         <div className="max-w-[1400px] mx-auto">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-2 h-2 bg-blood badge-glow" />
-            <span className="text-[11px] uppercase tracking-[0.5em] text-platinum/40 font-mono">
-              {roster.length} Represented
-            </span>
-          </div>
-          <h1 className="text-[clamp(48px,8vw,120px)] font-black uppercase leading-[0.85] tracking-tight">
-            Roster
+          <h1 className="font-canela-display text-[clamp(48px,8vw,120px)] leading-[0.88] tracking-[-0.045em] text-platinum">
+            Selected Talent
           </h1>
           <p className="mt-6 text-[15px] text-platinum/40 max-w-xl font-legal leading-relaxed">
             Each talent is represented exclusively. Digital likeness licensed only through
@@ -93,34 +90,44 @@ export default function ModelsPage() {
 
       {/* Control bar */}
       <section className="px-6 sm:px-12 pb-12">
-        <div className="max-w-[1400px] mx-auto border border-platinum/10 bg-smoke/30 px-6 py-4 flex flex-wrap items-center gap-6">
+        <div className="max-w-[1400px] mx-auto border border-platinum/10 bg-black/40 backdrop-blur-sm px-4 py-3 flex flex-wrap items-center gap-4 sm:px-5">
           {/* View toggle */}
           <div className="flex items-center gap-3">
             <span className="text-[10px] uppercase tracking-[0.3em] text-platinum/30">View</span>
-            <button
-              onClick={() => setView("editorial")}
-              className={`text-[11px] uppercase tracking-[0.3em] px-3 py-1.5 border transition-colors ${
-                view === "editorial"
-                  ? "border-blood/50 text-blood"
-                  : "border-platinum/10 text-platinum/30 hover:text-platinum/60"
-              }`}
-            >
-              Editorial
-            </button>
-            <button
-              onClick={() => setView("grid")}
-              className={`text-[11px] uppercase tracking-[0.3em] px-3 py-1.5 border transition-colors ${
-                view === "grid"
-                  ? "border-blood/50 text-blood"
-                  : "border-platinum/10 text-platinum/30 hover:text-platinum/60"
-              }`}
-            >
-              Grid
-            </button>
+            <div className="flex items-center gap-1 border border-platinum/10 bg-black/50 p-0.5">
+              <button
+                type="button"
+                onClick={() => setView("editorial")}
+                aria-label="Editorial view"
+                aria-pressed={view === "editorial"}
+                title="Editorial view"
+                className={`flex h-7 w-7 items-center justify-center border transition-colors ${
+                  view === "editorial"
+                    ? "border-platinum/20 bg-platinum/10 text-platinum"
+                    : "border-transparent text-platinum/30 hover:text-platinum/60"
+                }`}
+              >
+                <Rows3 className="h-3.5 w-3.5" strokeWidth={1.6} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("grid")}
+                aria-label="Grid view"
+                aria-pressed={view === "grid"}
+                title="Grid view"
+                className={`flex h-7 w-7 items-center justify-center border transition-colors ${
+                  view === "grid"
+                    ? "border-platinum/20 bg-platinum/10 text-platinum"
+                    : "border-transparent text-platinum/30 hover:text-platinum/60"
+                }`}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" strokeWidth={1.6} />
+              </button>
+            </div>
           </div>
 
           {/* Scale slider */}
-          <div className="flex items-center gap-3 flex-1 max-w-[200px]">
+          <div className="flex items-center gap-3 flex-1 max-w-[170px]">
             <span className="text-[10px] uppercase tracking-[0.3em] text-platinum/30">Scale</span>
             <input
               type="range"
@@ -139,7 +146,7 @@ export default function ModelsPage() {
           {/* Edit mode toggle */}
           <button
             onClick={() => setEditMode(!editMode)}
-            className={`text-[11px] uppercase tracking-[0.3em] px-4 py-1.5 border transition-colors ${
+            className={`text-[11px] tracking-[0.14em] px-3 py-1.5 border transition-colors ${
               editMode
                 ? "border-blood text-blood bg-blood/10"
                 : "border-platinum/10 text-platinum/30 hover:text-platinum/60"
@@ -200,9 +207,9 @@ export default function ModelsPage() {
       {/* Footer */}
       <footer className="border-t border-platinum/10 bg-black py-12 px-6 sm:px-12">
         <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Link href="/" className="text-[18px] font-bold tracking-[0.5em] uppercase text-platinum/30">SEMBLA</Link>
-          <p className="text-[11px] text-platinum/30 uppercase tracking-[0.3em] font-mono">
-            &copy; 2026 &middot; Exclusive Digital Agency
+          <Link href="/" className="font-canela-display text-[30px] leading-none tracking-[-0.04em] text-platinum/30">Sembla</Link>
+          <p className="text-[11px] text-platinum/30 tracking-[0.12em] font-mono">
+            &copy; 2026 Sembla
           </p>
         </div>
       </footer>
@@ -213,22 +220,25 @@ export default function ModelsPage() {
 /* ── Editable Field ── */
 function EditableField({
   value,
+  displayValue,
   onSave,
   editMode,
   className = "",
   tag: Tag = "span",
 }: {
   value: string;
+  displayValue?: string;
   onSave: (val: string) => void;
   editMode: boolean;
   className?: string;
   tag?: "span" | "p" | "h2";
 }) {
+  const editableValue = displayValue ?? value;
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
+  const [draft, setDraft] = useState(editableValue);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { setDraft(value); }, [value]);
+  useEffect(() => { setDraft(editableValue); }, [editableValue]);
   useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
 
   if (editing && editMode) {
@@ -239,16 +249,16 @@ function EditableField({
         onChange={(e) => setDraft(e.target.value)}
         onBlur={() => {
           setEditing(false);
-          if (draft !== value) onSave(draft);
+          if (draft !== editableValue) onSave(draft);
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             setEditing(false);
-            if (draft !== value) onSave(draft);
+            if (draft !== editableValue) onSave(draft);
           }
           if (e.key === "Escape") {
             setEditing(false);
-            setDraft(value);
+            setDraft(editableValue);
           }
         }}
         className={`bg-transparent border-b border-blood/40 outline-none w-full ${className}`}
@@ -261,7 +271,7 @@ function EditableField({
       onClick={() => editMode && setEditing(true)}
       className={`${className} ${editMode ? "editable-hover cursor-text" : ""}`}
     >
-      {value}
+      {editableValue}
     </Tag>
   );
 }
@@ -585,7 +595,7 @@ function ModelCard({
           <div className="lg:col-span-6 relative overflow-hidden">
             <div
               className="aspect-[3/4] lg:aspect-auto relative bg-smoke"
-              style={{ height: `${Math.round(85 * scale)}vh` }}
+              style={{ height: `${Math.round(78 * scale)}vh` }}
             >
               <EditablePhoto
                 src={model.image}
@@ -610,18 +620,15 @@ function ModelCard({
                 {String(index).padStart(2, "0")} / {String(total).padStart(2, "0")}
               </span>
 
-              {/* Status */}
-              <div className="flex items-center gap-3 mt-6">
-                <div className={`w-1.5 h-1.5 ${
-                  model.status === "Available" ? "bg-green-500" :
-                  model.status === "Booked" ? "bg-blood" : "bg-yellow-500"
-                }`} />
-                <EditableStatus
-                  value={model.status}
-                  onSave={(val) => onSave(model.id, "status", val)}
-                  editMode={editMode}
-                />
-              </div>
+              {editMode && (
+                <div className="mt-6">
+                  <EditableStatus
+                    value={model.status}
+                    onSave={(val) => onSave(model.id, "status", val)}
+                    editMode={editMode}
+                  />
+                </div>
+              )}
 
               {/* Name */}
               <div className="mt-6">
@@ -629,7 +636,7 @@ function ModelCard({
                   value={model.name}
                   onSave={(val) => onSave(model.id, "name", val)}
                   editMode={editMode}
-                  className="text-[clamp(32px,4vw,64px)] font-black uppercase leading-[0.9] tracking-tight block"
+                  className="font-canela-display text-[clamp(32px,4vw,64px)] leading-[0.94] tracking-[-0.04em] block"
                   tag="h2"
                 />
               </div>
@@ -638,9 +645,10 @@ function ModelCard({
               <div className="mt-4">
                 <EditableField
                   value={model.discipline}
-                  onSave={(val) => onSave(model.id, "discipline", val)}
+                  displayValue={toDisplayCase(model.discipline)}
+                  onSave={(val) => onSave(model.id, "discipline", normalizeDiscipline(val))}
                   editMode={editMode}
-                  className="text-[14px] sm:text-[16px] uppercase tracking-[0.3em] text-blood/70 block"
+                  className="text-[14px] sm:text-[16px] tracking-[0.12em] text-blood/70 block"
                 />
               </div>
 
@@ -656,22 +664,21 @@ function ModelCard({
 
               {/* Metadata grid */}
               <div className="mt-10 space-y-3 border-t border-platinum/10 pt-6">
-                <div className="flex justify-between text-[12px] uppercase tracking-[0.3em]">
-                  <span className="text-platinum/30">Base</span>
+                <div className="flex items-center justify-between gap-6 text-[12px]">
+                  <span className="shrink-0 uppercase tracking-[0.3em] text-platinum/30">Location</span>
                   <EditableField
                     value={model.city}
+                    displayValue={toDisplayCase(model.city)}
                     onSave={(val) => onSave(model.id, "city", val)}
                     editMode={editMode}
-                    className="text-platinum/60"
+                    className="min-w-[9rem] text-right text-[13px] tracking-[0.08em] text-platinum/60 sm:min-w-[12rem]"
                   />
                 </div>
-                <div className="flex justify-between text-[12px] uppercase tracking-[0.3em]">
-                  <span className="text-platinum/30">License Token</span>
-                  <span className="font-mono text-platinum/60">{model.token}</span>
-                </div>
-                <div className="flex justify-between text-[12px] uppercase tracking-[0.3em]">
-                  <span className="text-platinum/30">Consent</span>
-                  <span className="text-platinum/60">Auditable</span>
+                <div className="flex items-center justify-between gap-6 text-[12px]">
+                  <span className="shrink-0 uppercase tracking-[0.3em] text-platinum/30">License</span>
+                  <span className="min-w-[9rem] text-right font-mono text-platinum/60 sm:min-w-[12rem]">
+                    {model.token}
+                  </span>
                 </div>
               </div>
 
@@ -735,18 +742,15 @@ function GridCard({
           </span>
         </div>
 
-        {/* Status badge */}
-        <div className="absolute top-3 right-3 flex items-center gap-2">
-          <div className={`w-1.5 h-1.5 ${
-            model.status === "Available" ? "bg-green-500" :
-            model.status === "Booked" ? "bg-blood" : "bg-yellow-500"
-          }`} />
-          <EditableStatus
-            value={model.status}
-            onSave={(val) => onSave(model.id, "status", val)}
-            editMode={editMode}
-          />
-        </div>
+        {editMode && (
+          <div className="absolute top-3 right-3">
+            <EditableStatus
+              value={model.status}
+              onSave={(val) => onSave(model.id, "status", val)}
+              editMode={editMode}
+            />
+          </div>
+        )}
 
         {/* Bottom overlay details */}
         <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
@@ -762,22 +766,24 @@ function GridCard({
           value={model.name}
           onSave={(val) => onSave(model.id, "name", val)}
           editMode={editMode}
-          className="text-[16px] font-bold uppercase tracking-[0.15em] block"
+          className="font-canela-text text-[22px] leading-none tracking-[-0.03em] block"
         />
         <EditableField
           value={model.discipline}
-          onSave={(val) => onSave(model.id, "discipline", val)}
+          displayValue={toDisplayCase(model.discipline)}
+          onSave={(val) => onSave(model.id, "discipline", normalizeDiscipline(val))}
           editMode={editMode}
-          className="text-[11px] uppercase tracking-[0.3em] text-blood/60 block"
+          className="text-[11px] tracking-[0.14em] text-blood/60 block"
         />
-        <div className="flex justify-between items-center pt-2 border-t border-platinum/5">
+        <div className="flex items-center justify-between gap-4 pt-2 border-t border-platinum/5">
           <EditableField
             value={model.city}
+            displayValue={toDisplayCase(model.city)}
             onSave={(val) => onSave(model.id, "city", val)}
             editMode={editMode}
-            className="text-[11px] text-platinum/30 uppercase tracking-[0.2em]"
+            className="min-w-0 flex-1 text-[11px] tracking-[0.12em] text-platinum/30"
           />
-          <span className="text-[10px] font-mono text-platinum/20">{model.token}</span>
+          <span className="shrink-0 pl-4 text-[10px] font-mono text-platinum/20">{model.token}</span>
         </div>
       </div>
     </article>

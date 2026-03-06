@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { normalizeDiscipline, toDisplayCase } from "@/lib/display";
 import { useRoster } from "@/lib/RosterContext";
 import { generateToken, generateId, compressImage } from "@/lib/roster";
 import type { RosterModel } from "@/lib/roster";
@@ -75,7 +76,7 @@ export default function RosterUploadPage() {
     const newModel: RosterModel = {
       id: generateId(),
       name,
-      discipline: discipline || "DJ / Model",
+      discipline: discipline ? normalizeDiscipline(discipline) : "DJ / Model",
       city: city || "—",
       token: generateToken(),
       image: imagePath,
@@ -116,12 +117,13 @@ export default function RosterUploadPage() {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-black/95 backdrop-blur-sm border-b border-platinum/10 flex items-center px-6 sm:px-12 z-50">
         <div className="w-full flex items-center justify-between max-w-[1400px] mx-auto">
-          <Link href="/" className="text-platinum text-[18px] font-bold tracking-[0.5em] uppercase">
-            SEMBLA
+          <Link href="/" className="font-canela-display text-[30px] leading-none tracking-[-0.04em] text-platinum">
+            Sembla
           </Link>
-          <nav className="flex items-center gap-8 text-[11px] uppercase tracking-[0.4em]">
-            <Link href="/" className="text-platinum/50 hover:text-platinum transition-colors">Home</Link>
-            <Link href="/models" className="text-platinum/50 hover:text-platinum transition-colors">Roster</Link>
+          <nav className="flex items-center gap-6 text-[11px] tracking-[0.18em] sm:gap-8">
+            <Link href="/offerings" className="text-platinum/50 hover:text-platinum transition-colors">Offerings</Link>
+            <Link href="/models" className="text-platinum/50 hover:text-platinum transition-colors">Selected Talent</Link>
+            <Link href="/inquiry" className="text-platinum/50 hover:text-platinum transition-colors">Inquiry</Link>
             <Link href="/roster/upload" className="text-blood transition-colors">Admin</Link>
           </nav>
         </div>
@@ -136,7 +138,7 @@ export default function RosterUploadPage() {
               Admin
             </span>
           </div>
-          <h1 className="text-[clamp(36px,5vw,64px)] font-black uppercase leading-[0.9] tracking-tight">
+          <h1 className="font-canela-display text-[clamp(36px,5vw,64px)] leading-[0.94] tracking-[-0.04em] text-platinum">
             Roster Management
           </h1>
           <p className="mt-4 text-[14px] text-platinum/40 font-legal">
@@ -255,7 +257,7 @@ export default function RosterUploadPage() {
           <div className="lg:col-span-7">
             <div className="flex items-center justify-between mb-6">
               <p className="text-[12px] uppercase tracking-[0.4em] text-platinum/50">
-                Current Roster &middot; {roster.length} model{roster.length !== 1 ? "s" : ""}
+                Current roster
               </p>
 
               {/* Reset button */}
@@ -319,18 +321,21 @@ export default function RosterUploadPage() {
 /* ── Inline editable text field for admin list ── */
 function InlineEdit({
   value,
+  displayValue,
   onSave,
   className = "",
 }: {
   value: string;
+  displayValue?: string;
   onSave: (val: string) => void;
   className?: string;
 }) {
+  const editableValue = displayValue ?? value;
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
+  const [draft, setDraft] = useState(editableValue);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { setDraft(value); }, [value]);
+  useEffect(() => { setDraft(editableValue); }, [editableValue]);
   useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
 
   if (editing) {
@@ -341,11 +346,11 @@ function InlineEdit({
         onChange={(e) => setDraft(e.target.value)}
         onBlur={() => {
           setEditing(false);
-          if (draft !== value) onSave(draft);
+          if (draft !== editableValue) onSave(draft);
         }}
         onKeyDown={(e) => {
-          if (e.key === "Enter") { setEditing(false); if (draft !== value) onSave(draft); }
-          if (e.key === "Escape") { setEditing(false); setDraft(value); }
+          if (e.key === "Enter") { setEditing(false); if (draft !== editableValue) onSave(draft); }
+          if (e.key === "Escape") { setEditing(false); setDraft(editableValue); }
         }}
         className={`bg-transparent border-b border-blood/40 outline-none ${className}`}
       />
@@ -357,7 +362,7 @@ function InlineEdit({
       onClick={() => setEditing(true)}
       className={`editable-hover cursor-text ${className}`}
     >
-      {value}
+      {editableValue}
     </span>
   );
 }
@@ -437,20 +442,24 @@ function RosterItem({
         <InlineEdit
           value={model.name}
           onSave={(val) => onUpdate("name", val)}
-          className="text-[15px] font-bold uppercase tracking-[0.15em]"
+          className="font-canela-text text-[20px] leading-none tracking-[-0.03em]"
         />
         <InlineEdit
           value={model.discipline}
-          onSave={(val) => onUpdate("discipline", val)}
-          className="text-[11px] text-platinum/40 uppercase tracking-[0.2em]"
+          displayValue={toDisplayCase(model.discipline)}
+          onSave={(val) => onUpdate("discipline", normalizeDiscipline(val))}
+          className="text-[11px] text-platinum/40 tracking-[0.14em]"
         />
-        <div className="flex items-center gap-4 mt-1">
+        <div className="mt-1 flex items-center gap-4">
           <InlineEdit
             value={model.city}
+            displayValue={toDisplayCase(model.city)}
             onSave={(val) => onUpdate("city", val)}
-            className="text-[10px] text-platinum/30 font-mono"
+            className="min-w-[6rem] px-1 text-[10px] tracking-[0.1em] text-platinum/30"
           />
-          <span className="text-[10px] text-platinum/20 font-mono">{model.token}</span>
+          <span className="shrink-0 border-l border-platinum/10 pl-4 text-[10px] text-platinum/20 font-mono">
+            {model.token}
+          </span>
           <select
             value={model.status}
             onChange={(e) => onUpdate("status", e.target.value)}

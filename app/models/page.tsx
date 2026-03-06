@@ -26,10 +26,37 @@ async function uploadImage(file: File): Promise<string> {
 
 export default function ModelsPage() {
   const { roster, isLoaded, updateModel, addModel } = useRoster();
+  const [isAdmin, setIsAdmin] = useState(false);
   const [view, setView] = useState<ViewMode>("editorial");
-  const [scale, setScale] = useState(1);
   const [editMode, setEditMode] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadAdminSession = async () => {
+      try {
+        const response = await fetch("/api/admin/session", { cache: "no-store" });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (active) setIsAdmin(Boolean(data.authenticated));
+      } catch {
+        if (active) setIsAdmin(false);
+      }
+    };
+
+    loadAdminSession();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isAdmin && editMode) {
+      setEditMode(false);
+    }
+  }, [isAdmin, editMode]);
 
   const flashSaved = useCallback(() => {
     setSavedFlash(true);
@@ -70,7 +97,6 @@ export default function ModelsPage() {
             <Link href="/offerings" className="text-platinum/50 hover:text-platinum transition-colors">Offerings</Link>
             <Link href="/models" className="text-platinum transition-colors">Selected Talent</Link>
             <Link href="/inquiry" className="text-platinum/50 hover:text-platinum transition-colors">Inquiry</Link>
-            <Link href="/roster/upload" className="text-blood/70 hover:text-blood transition-colors">Admin</Link>
           </nav>
         </div>
       </header>
@@ -90,7 +116,7 @@ export default function ModelsPage() {
 
       {/* Control bar */}
       <section className="px-6 sm:px-12 pb-12">
-        <div className="max-w-[1400px] mx-auto border border-platinum/10 bg-black/40 backdrop-blur-sm px-4 py-3 flex flex-wrap items-center gap-4 sm:px-5">
+        <div className="max-w-[1400px] mx-auto border border-platinum/10 bg-black/40 backdrop-blur-sm px-4 py-3 flex flex-wrap items-center justify-end gap-4 sm:px-5">
           {/* View toggle */}
           <div className="flex items-center gap-3">
             <span className="text-[10px] uppercase tracking-[0.3em] text-platinum/30">View</span>
@@ -126,34 +152,19 @@ export default function ModelsPage() {
             </div>
           </div>
 
-          {/* Scale slider */}
-          <div className="flex items-center gap-3 flex-1 max-w-[170px]">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-platinum/30">Scale</span>
-            <input
-              type="range"
-              min="0.6"
-              max="1.4"
-              step="0.05"
-              value={scale}
-              onChange={(e) => setScale(parseFloat(e.target.value))}
-              className="flex-1"
-            />
-            <span className="text-[10px] font-mono text-platinum/30 w-8 text-right">
-              {scale.toFixed(1)}x
-            </span>
-          </div>
-
           {/* Edit mode toggle */}
-          <button
-            onClick={() => setEditMode(!editMode)}
-            className={`text-[11px] tracking-[0.14em] px-3 py-1.5 border transition-colors ${
-              editMode
-                ? "border-blood text-blood bg-blood/10"
-                : "border-platinum/10 text-platinum/30 hover:text-platinum/60"
-            }`}
-          >
-            {editMode ? "Editing" : "Edit Mode"}
-          </button>
+          {isAdmin ? (
+            <button
+              onClick={() => setEditMode(!editMode)}
+              className={`text-[11px] tracking-[0.14em] px-3 py-1.5 border transition-colors ${
+                editMode
+                  ? "border-blood text-blood bg-blood/10"
+                  : "border-platinum/10 text-platinum/30 hover:text-platinum/60"
+              }`}
+            >
+              {editMode ? "Editing" : "Edit Mode"}
+            </button>
+          ) : null}
 
           {/* Saved indicator */}
           {savedFlash && (
@@ -176,7 +187,6 @@ export default function ModelsPage() {
                 total={roster.length}
                 editMode={editMode}
                 onSave={handleFieldSave}
-                scale={scale}
               />
             ))}
             {editMode && <AddPhotoCard onAdd={handleAddPhoto} variant="editorial" />}
@@ -185,7 +195,7 @@ export default function ModelsPage() {
           <div
             className="max-w-[1400px] mx-auto px-6 sm:px-12 grid gap-6"
             style={{
-              gridTemplateColumns: `repeat(auto-fill, minmax(${Math.round(280 * scale)}px, 1fr))`
+              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
             }}
           >
             {roster.map((model, idx) => (
@@ -196,7 +206,6 @@ export default function ModelsPage() {
                 total={roster.length}
                 editMode={editMode}
                 onSave={handleFieldSave}
-                scale={scale}
               />
             ))}
             {editMode && <AddPhotoCard onAdd={handleAddPhoto} variant="grid" />}
@@ -558,14 +567,12 @@ function ModelCard({
   total,
   editMode,
   onSave,
-  scale,
 }: {
   model: RosterModel;
   index: number;
   total: number;
   editMode: boolean;
   onSave: (id: string, field: keyof RosterModel, value: string) => void;
-  scale: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -586,7 +593,7 @@ function ModelCard({
       ref={ref}
       id={model.token}
       className="border-t border-platinum/5 scroll-mt-20"
-      style={{ marginBottom: `${Math.round(48 * scale)}px` }}
+      style={{ marginBottom: "48px" }}
     >
       <div className="max-w-[1400px] mx-auto px-6 sm:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-12 py-16 lg:py-0">
@@ -595,7 +602,7 @@ function ModelCard({
           <div className="lg:col-span-6 relative overflow-hidden">
             <div
               className="aspect-[3/4] lg:aspect-auto relative bg-smoke"
-              style={{ height: `${Math.round(78 * scale)}vh` }}
+              style={{ height: "78vh" }}
             >
               <EditablePhoto
                 src={model.image}
@@ -706,14 +713,12 @@ function GridCard({
   total,
   editMode,
   onSave,
-  scale,
 }: {
   model: RosterModel;
   index: number;
   total: number;
   editMode: boolean;
   onSave: (id: string, field: keyof RosterModel, value: string) => void;
-  scale: number;
 }) {
   return (
     <article

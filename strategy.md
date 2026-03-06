@@ -127,7 +127,7 @@ Supply side:
 
 ### Offer Next
 
-- digital twin build
+- repeat use
 - twin refresh and stewardship retainers
 - localization and versioning across markets
 - partner-supported monitoring and takedowns

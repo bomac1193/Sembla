@@ -19,7 +19,7 @@ The underlying offer must stay clear, high-value, and hard to copy.
 
 These are the three offers Sembla should lead with.
 
-### 1. Likeness Licensing
+### 1. Campaign Licensing
 
 What it is:
 
@@ -44,19 +44,19 @@ What the client receives:
 This should remain the first and clearest offer.
 It is the bridge between representation and commercial use.
 
-### 2. Digital Twin Build
+### 2. Repeat Use
 
 What it is:
 
-- consent-led creation of a reusable digital likeness
-- built from approved source material
-- structured for repeatable commercial output
+- governed extension of an approved face across formats, timelines, and markets
+- enabled through digital twin production where needed
+- structured around approvals, restrictions, and reuse control
 
 Why it matters:
 
-- reduces production drag
 - makes repeat campaigns faster
-- lets one approved face work across multiple formats and uses
+- gives brands reusable digital access without losing control
+- lets one approved face work across multiple formats and markets
 
 What the client receives:
 
@@ -65,10 +65,10 @@ What the client receives:
 - test outputs and approval rounds
 - initial production-ready still or selective video outputs
 
-This is not the lead story on its own.
-It is valuable because it sits inside rights, approvals, and governance.
+This is not a generic avatar service.
+It is valuable because repeat use sits inside rights, approvals, and governance.
 
-### 3. Stewardship & Governance
+### 3. Governance
 
 What it is:
 
@@ -205,9 +205,9 @@ If the answer is mostly no, it should not be a focus.
 
 Sembla's focus should be:
 
-- Likeness Licensing
-- Digital Twin Build
-- Stewardship & Governance
+- Campaign Licensing
+- Repeat Use
+- Governance
 
 Everything else is secondary unless it strengthens those three.
 

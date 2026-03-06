@@ -45,9 +45,7 @@ export default function LandingPage() {
             </p>
 
             <p className="mt-8 max-w-[700px] text-[17px] leading-[1.8] text-platinum/58 sm:text-[20px]">
-              Most teams can generate an image. Far fewer can clear the rights
-              behind it. Sembla gives brands a direct route to represented
-              talent, documented consent, and commercial usage they can actually use.
+              Rights-cleared talent access for digital campaigns, without building the governance stack in-house.
             </p>
 
             <div className="mt-12 flex flex-wrap items-center gap-4 sm:gap-6">
@@ -61,28 +59,14 @@ export default function LandingPage() {
                 href="/inquiry"
                 className="text-[14px] tracking-[0.12em] text-platinum/40 hover:text-platinum transition-colors"
               >
-                Inquiry &rarr;
+                Inquiry
               </Link>
             </div>
 
-            <div className="mt-16 grid max-w-[980px] gap-px bg-platinum/10 sm:grid-cols-3">
-              <div className="bg-black px-6 py-6">
-                <p className="text-[15px] leading-[1.7] text-platinum/55">
-                  Generation is easy. Approval, provenance, and usage rights are not.
-                </p>
-              </div>
-
-              <div className="bg-black px-6 py-6">
-                <p className="text-[15px] leading-[1.7] text-platinum/55">
-                  Campaign licensing, digital twin builds, and commercial use structured from the outset.
-                </p>
-              </div>
-
-              <div className="bg-black px-6 py-6">
-                <p className="text-[15px] leading-[1.7] text-platinum/55">
-                  Represented talent with documented consent, provenance, and governed brand use.
-                </p>
-              </div>
+            <div className="mt-16 max-w-[760px] border border-platinum/10 bg-black px-6 py-6">
+              <p className="text-[15px] leading-[1.7] text-platinum/55">
+                Represented talent, clear rights, and governed commercial use.
+              </p>
             </div>
           </div>
         </div>
@@ -252,7 +236,6 @@ function NavBar() {
           <Link href="/offerings" className="text-platinum/50 hover:text-platinum transition-colors">Offerings</Link>
           <Link href="/models" className="text-platinum/50 hover:text-platinum transition-colors">Selected Talent</Link>
           <Link href="/inquiry" className="text-platinum/50 hover:text-platinum transition-colors">Inquiry</Link>
-          <Link href="/roster/upload" className="text-blood/70 hover:text-blood transition-colors">Admin</Link>
         </nav>
       </div>
     </header>

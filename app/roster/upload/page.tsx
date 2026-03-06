@@ -124,7 +124,8 @@ export default function RosterUploadPage() {
             <Link href="/offerings" className="text-platinum/50 hover:text-platinum transition-colors">Offerings</Link>
             <Link href="/models" className="text-platinum/50 hover:text-platinum transition-colors">Selected Talent</Link>
             <Link href="/inquiry" className="text-platinum/50 hover:text-platinum transition-colors">Inquiry</Link>
-            <Link href="/roster/upload" className="text-blood transition-colors">Admin</Link>
+            <Link href="/admin/passports" className="text-platinum/50 hover:text-platinum transition-colors">Passports</Link>
+            <Link href="/admin" className="text-blood transition-colors">Admin</Link>
           </nav>
         </div>
       </header>

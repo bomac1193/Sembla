@@ -26,7 +26,7 @@ Every offer should resolve into:
 - a traceable delivery package
 - a reusable rights record
 
-## 1. Likeness Licensing
+## 1. Campaign Licensing
 
 ### What the client is buying
 
@@ -71,11 +71,11 @@ Commercial access to represented talent for a defined campaign or usage window.
 5. Align the creative and delivery plan.
 6. Deliver the outputs together with the approval and usage package.
 
-## 2. Digital Twin Build
+## 2. Repeat Use
 
 ### What the client is buying
 
-A consent-led digital likeness build for repeatable commercial use.
+A governed extension of an approved face across formats, timelines, and markets, using digital twin production where needed.
 
 ### Exact deliverables
 
@@ -98,11 +98,11 @@ A consent-led digital likeness build for repeatable commercial use.
 - Test outputs and approval rounds:
   the validation stage before the twin is approved for commercial use
 - Approved digital twin:
-  the likeness system ready for controlled production use
+  the governed likeness system ready for controlled production use
 - Initial production-ready outputs:
-  the first still or selective video assets generated from the approved twin
+  the first still or selective video assets generated from the approved digital twin
 - Twin usage notes:
-  what the twin can and cannot be used for within the agreed scope
+  what the digital twin can and cannot be used for within the agreed scope
 
 ### How we do it
 
@@ -113,7 +113,7 @@ A consent-led digital likeness build for repeatable commercial use.
 5. Finalize the twin only after approval.
 6. Deliver the approved twin outputs together with usage notes.
 
-## 3. Stewardship & Governance
+## 3. Governance
 
 ### What the client is buying
 
@@ -265,9 +265,9 @@ Those should always be explicitly scoped.
 
 Primary client offers:
 
-- Likeness Licensing
-- Digital Twin Build
-- Stewardship & Governance
+- Campaign Licensing
+- Repeat Use
+- Governance
 
 Secondary strategic offers:
 

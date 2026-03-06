@@ -26,15 +26,15 @@ Use this as directional strategy input, not as a substitute for real interviews.
 - Core ICP average: `7.3 / 10`
 - Adjacent missed-market average: `7.4 / 10`
 - Critics / haters average: `5.1 / 10`
-- Highest-resonance offer: `Likeness Licensing`
-- Second-highest resonance: `Digital Twin Build`
-- Most strategically valued but least instantly understood: `Stewardship & Governance`
+- Highest-resonance offer: `Campaign Licensing`
+- Second-highest resonance: `Repeat Use`
+- Most strategically valued but least instantly understood: `Governance`
 
 ## What People Consistently Loved
 
 - The brand feels premium, private, and differentiated from generic AI studios.
 - `Selected Talent` is a stronger proof layer than a pure strategy site.
-- `Likeness Licensing` lands quickly with brand, legal, and talent-side buyers.
+- `Campaign Licensing` lands quickly with brand, legal, and talent-side buyers.
 - The inquiry path is simple and appropriately discreet.
 - The rights-first angle gives the company a real business reason to exist.
 
@@ -42,7 +42,7 @@ Use this as directional strategy input, not as a substitute for real interviews.
 
 - Too little proof for such a high-trust offer.
 - Some language still feels conceptual instead of commercial.
-- `Stewardship & Governance` sounds important but needs examples.
+- `Governance` sounds important but needs examples.
 - The public `Admin` link feels internal and weakens luxury positioning.
 - There is no visible case study, process map, or sample deliverable.
 
@@ -136,7 +136,7 @@ Hated: Needs to know what the handoff looks like.
 To get to 10: Show sample asset package structure.
 
 18. `Creative agency rights producer` - `9/10`
-Loved: `Likeness Licensing` lands immediately.
+Loved: `Campaign Licensing` lands immediately.
 Hated: Very little, except missing proof.
 To get to 10: One sample usage scope sheet.
 
@@ -300,7 +300,7 @@ The harshest critics converged on the same problems:
    - structure
    - outputs
    - governance
-6. Make `Stewardship & Governance` easier to grasp with one concrete example.
+6. Make `Governance` easier to grasp with one concrete example.
 7. Add service-specific inquiry presets for each offer and sector.
 
 ## What To Reduce

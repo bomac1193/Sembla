@@ -8,8 +8,12 @@ type InquiryForm = {
   name: string;
   company: string;
   email: string;
+  sector: string;
+  need: string;
   campaign: string;
   usage: string;
+  territory: string;
+  term: string;
   notes: string;
 };
 
@@ -17,8 +21,12 @@ const initialForm: InquiryForm = {
   name: "",
   company: "",
   email: "",
+  sector: "",
+  need: "",
   campaign: "",
   usage: "",
+  territory: "",
+  term: "",
   notes: ""
 };
 
@@ -31,8 +39,12 @@ function buildMailto(form: InquiryForm): string {
     `Name: ${form.name || "-"}`,
     `Company: ${form.company || "-"}`,
     `Email: ${form.email || "-"}`,
+    `Sector: ${form.sector || "-"}`,
+    `Need now: ${form.need || "-"}`,
     `Campaign: ${form.campaign || "-"}`,
     `Usage: ${form.usage || "-"}`,
+    `Territory: ${form.territory || "-"}`,
+    `Term: ${form.term || "-"}`,
     "",
     "Notes:",
     form.notes || "-"
@@ -45,6 +57,7 @@ export default function InquiryPage() {
   const searchParams = useSearchParams();
   const [form, setForm] = useState<InquiryForm>(initialForm);
   const service = searchParams.get("service");
+  const sector = searchParams.get("sector");
 
   const updateField = (field: keyof InquiryForm, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -53,11 +66,20 @@ export default function InquiryPage() {
   useEffect(() => {
     if (!service) return;
     setForm((prev) => (
-      prev.campaign
+      prev.need
         ? prev
-        : { ...prev, campaign: service }
+        : { ...prev, need: service }
     ));
   }, [service]);
+
+  useEffect(() => {
+    if (!sector) return;
+    setForm((prev) => (
+      prev.sector
+        ? prev
+        : { ...prev, sector }
+    ));
+  }, [sector]);
 
   return (
     <main className="min-h-screen bg-black text-platinum">
@@ -70,7 +92,6 @@ export default function InquiryPage() {
             <Link href="/offerings" className="text-platinum/50 hover:text-platinum transition-colors">Offerings</Link>
             <Link href="/models" className="text-platinum/50 hover:text-platinum transition-colors">Selected Talent</Link>
             <Link href="/inquiry" className="text-platinum transition-colors">Inquiry</Link>
-            <Link href="/roster/upload" className="text-blood/70 hover:text-blood transition-colors">Admin</Link>
           </nav>
         </div>
       </header>
@@ -85,8 +106,7 @@ export default function InquiryPage() {
               Access for campaigns, licensing, and selected talent requests.
             </h1>
             <p className="mt-6 max-w-[34rem] text-[16px] leading-[1.8] text-platinum/58 sm:text-[18px]">
-              Tell us who you are, what you need, and the usage you are considering.
-              We will respond directly.
+              Share the sector, need, usage, territory, and term. We will respond directly.
             </p>
 
             <div className="mt-12 space-y-6 border-t border-platinum/10 pt-8">
@@ -141,8 +161,42 @@ export default function InquiryPage() {
                 />
               </label>
 
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className="block">
+                  <span className="mb-2 block text-[11px] tracking-[0.18em] text-platinum/38">Sector</span>
+                  <select
+                    value={form.sector}
+                    onChange={(e) => updateField("sector", e.target.value)}
+                    className="w-full border border-platinum/15 bg-black px-4 py-3 text-[14px] text-platinum outline-none transition-colors focus:border-blood/40"
+                  >
+                    <option value="">Select sector</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Beauty">Beauty</option>
+                    <option value="Hospitality">Hospitality</option>
+                    <option value="Spirits">Spirits</option>
+                    <option value="Other premium sector">Other premium sector</option>
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="mb-2 block text-[11px] tracking-[0.18em] text-platinum/38">Need now</span>
+                  <select
+                    value={form.need}
+                    onChange={(e) => updateField("need", e.target.value)}
+                    className="w-full border border-platinum/15 bg-black px-4 py-3 text-[14px] text-platinum outline-none transition-colors focus:border-blood/40"
+                  >
+                    <option value="">Select need</option>
+                    <option value="Campaign Licensing">Campaign Licensing</option>
+                    <option value="Repeat Use">Repeat Use</option>
+                    <option value="Governance">Governance</option>
+                    <option value="Digital Rights Representation">Digital Rights Representation</option>
+                    <option value="Selected Talent Request">Selected Talent Request</option>
+                    <option value="Full Redacted Proof Pack">Full Redacted Proof Pack</option>
+                  </select>
+                </label>
+              </div>
+
               <label className="block">
-                <span className="mb-2 block text-[11px] tracking-[0.18em] text-platinum/38">Campaign</span>
+                <span className="mb-2 block text-[11px] tracking-[0.18em] text-platinum/38">Campaign or brief</span>
                 <input
                   value={form.campaign}
                   onChange={(e) => updateField("campaign", e.target.value)}
@@ -160,6 +214,27 @@ export default function InquiryPage() {
                   className="w-full border border-platinum/15 bg-black px-4 py-3 text-[14px] text-platinum placeholder:text-platinum/18 outline-none transition-colors focus:border-blood/40"
                 />
               </label>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className="block">
+                  <span className="mb-2 block text-[11px] tracking-[0.18em] text-platinum/38">Territory</span>
+                  <input
+                    value={form.territory}
+                    onChange={(e) => updateField("territory", e.target.value)}
+                    placeholder="UK, EU, GCC, global..."
+                    className="w-full border border-platinum/15 bg-black px-4 py-3 text-[14px] text-platinum placeholder:text-platinum/18 outline-none transition-colors focus:border-blood/40"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block text-[11px] tracking-[0.18em] text-platinum/38">Term</span>
+                  <input
+                    value={form.term}
+                    onChange={(e) => updateField("term", e.target.value)}
+                    placeholder="3 months, 12 months, seasonal..."
+                    className="w-full border border-platinum/15 bg-black px-4 py-3 text-[14px] text-platinum placeholder:text-platinum/18 outline-none transition-colors focus:border-blood/40"
+                  />
+                </label>
+              </div>
 
               <label className="block">
                 <span className="mb-2 block text-[11px] tracking-[0.18em] text-platinum/38">Notes</span>

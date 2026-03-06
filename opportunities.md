@@ -22,9 +22,9 @@ Recommended structure:
 
 1. Campaign booking
    Rights-cleared deliverables for a defined campaign scope
-2. Digital twin build
+2. Repeat use
    Capture, training, voice, likeness setup, approvals, and guardrails
-3. Twin management
+3. Governance
    Ongoing refreshes, new looks, localization, usage governance, access control
 
 ## Digital Twin Opportunity
@@ -65,6 +65,5 @@ Short term:
 
 Long term:
 
-- develop digital twin builds into a distinct service line
+- develop repeat-use capability into a distinct service line
 - support them with stronger approval, access, and usage controls
-
